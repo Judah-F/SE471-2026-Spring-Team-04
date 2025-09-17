@@ -1,17 +1,20 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class Shuffler {
     private final int CARD_COUNT = 52;
-    private final int[] cards;
 
-    public Shuffler() {
-        cards = new int[CARD_COUNT];
-        for (int i = 0; i < CARD_COUNT; i++) {
-            cards[i] = i;
+    public ArrayList<Integer> GetShuffledArray() {
+        ArrayList<Integer> shuffledArray = new ArrayList<>();
+        Random rng = new Random();
+        while (shuffledArray.size() < CARD_COUNT) {
+            int newNum = rng.nextInt(0, CARD_COUNT);
+            while (!shuffledArray.contains(newNum)) {
+                newNum = rng.nextInt(0, CARD_COUNT);
+            }
+            shuffledArray.add(newNum);
         }
-    }
-
-    public int[] GetShuffledArray() {
-        return new int[5];
     }
 }
