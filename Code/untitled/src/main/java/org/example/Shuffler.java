@@ -1,8 +1,8 @@
-﻿package org.example;
+package org.example;
 
 public class Shuffler {
     private final int CARD_COUNT = 52;
-    private int[] cards;
+    private final int[] cards;
 
     public Shuffler() {
         cards = new int[CARD_COUNT];
