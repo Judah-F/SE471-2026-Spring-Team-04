@@ -5,6 +5,7 @@ import java.util.Random;
 
 public class Shuffler {
     private final int CARD_COUNT = 52;
+    private final int SUITS = 4;
 
     public ArrayList<Integer> GetShuffledArray() {
         ArrayList<Integer> shuffledArray = new ArrayList<>();
@@ -16,5 +17,12 @@ public class Shuffler {
             }
             shuffledArray.add(newNum);
         }
+        return shuffledArray;
+    }
+
+    public String getCardNumberAsString(int cardNumber) {
+        int suit = (int) Math.floor((float) cardNumber / SUITS);
+        int card = cardNumber % (CARD_COUNT / SUITS);
+        return suit + "_" + card;
     }
 }
