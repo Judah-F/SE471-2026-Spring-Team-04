@@ -12,7 +12,7 @@ public class Shuffler {
         Random rng = new Random();
         while (shuffledArray.size() < CARD_COUNT) {
             int newNum = rng.nextInt(0, CARD_COUNT);
-            while (!shuffledArray.contains(newNum)) {
+            while (shuffledArray.contains(newNum)) {
                 newNum = rng.nextInt(0, CARD_COUNT);
             }
             shuffledArray.add(newNum);
