@@ -1,26 +1,62 @@
 package com.weatherboys.weatherguard;
 
+import com.weatherboys.weatherguard.display.Panel_AttendanceData;
+import com.weatherboys.weatherguard.display.Panel_AttendanceTable;
+import com.weatherboys.weatherguard.display.Panel_WeatherInformation;
+import com.weatherboys.weatherguard.display.Panel_WeatherMap;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class WeatherGuard extends JFrame implements ActionListener {
-    final int WINDOW_WIDTH = 640;
-    final int WINDOW_HEIGHT = 480;
+    public static final int WINDOW_WIDTH = 640;
+    public static final int WINDOW_HEIGHT = 480;
 
     public WeatherGuard() {
         setTitle("WeatherGuard");
         setLocationRelativeTo(null);
-        getContentPane().setBackground(new Color(0, 136, 170));
+        getContentPane().setBackground(new Color(150, 170, 200));
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        createAndAddPanels();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setResizable(true);
         setVisible(true);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        
+    }
 
+    private void createAndAddPanels() {
+
+        // Use a GridLayout for a 2x2 arrangement
+        setLayout(new GridLayout(1, 1));
+        setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+
+        // Create displays for all desired information
+        Panel_AttendanceTable attendanceTable = new Panel_AttendanceTable();
+        Panel_WeatherInformation weatherInformation = new Panel_WeatherInformation();
+        Panel_AttendanceData attendanceData = new Panel_AttendanceData();
+        Panel_WeatherMap weatherMap = new Panel_WeatherMap();
+
+        JSplitPane topHorzSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceTable, weatherInformation);
+        JSplitPane botHorzSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceData, weatherMap);
+        JSplitPane vertSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topHorzSplit, botHorzSplit); // Intellij complaining for no reason ;-;
+
+        topHorzSplit.setDividerSize(5);
+        botHorzSplit.setDividerSize(5);
+        vertSplit.setDividerSize(5);
+        
+        add(vertSplit);
+
+        topHorzSplit.setDividerLocation(0.75);
+        botHorzSplit.setDividerLocation(0.75);
+        vertSplit.setDividerLocation(0.75);
+
+        //Add to frame
     }
 }
