@@ -16,7 +16,7 @@ public class WeatherGuard extends JFrame implements ActionListener {
     public static final int WINDOW_WIDTH = 1280;
     public static final int WINDOW_HEIGHT = 720;
 
-    private JSplitPane topSplit, botSplit, vertSplit
+    private JSplitPane topSplit, botSplit, vertSplit;
 
 
     public WeatherGuard() {
