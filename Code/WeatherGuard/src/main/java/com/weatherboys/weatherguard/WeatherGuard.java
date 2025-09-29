@@ -9,16 +9,28 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class WeatherGuard extends JFrame implements ActionListener {
-    public static final int WINDOW_WIDTH = 640;
-    public static final int WINDOW_HEIGHT = 480;
+    public static final int WINDOW_WIDTH = 1280;
+    public static final int WINDOW_HEIGHT = 720;
+
+    private JSplitPane topSplit, botSplit, vertSplit
+
 
     public WeatherGuard() {
         setTitle("WeatherGuard");
         setLocationRelativeTo(null);
         getContentPane().setBackground(new Color(150, 170, 200));
         setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent componentEvent) {
+                // do stuff
+            }
+        });
+
         createAndAddPanels();
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -43,19 +55,19 @@ public class WeatherGuard extends JFrame implements ActionListener {
         Panel_AttendanceData attendanceData = new Panel_AttendanceData();
         Panel_WeatherMap weatherMap = new Panel_WeatherMap();
 
-        JSplitPane topHorzSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceTable, weatherInformation);
-        JSplitPane botHorzSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceData, weatherMap);
-        JSplitPane vertSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topHorzSplit, botHorzSplit); // Intellij complaining for no reason ;-;
+        topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceTable, weatherInformation);
+        botSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceData, weatherMap);
+        vertSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplit, botSplit); // Intellij complaining for no reason ;-;
 
-        topHorzSplit.setDividerSize(5);
-        botHorzSplit.setDividerSize(5);
+        topSplit.setDividerSize(5);
+        botSplit.setDividerSize(5);
         vertSplit.setDividerSize(5);
-        
+
         add(vertSplit);
 
-        topHorzSplit.setDividerLocation(0.75);
-        botHorzSplit.setDividerLocation(0.75);
-        vertSplit.setDividerLocation(0.75);
+        topSplit.setDividerLocation((int) (0.75 * WINDOW_WIDTH));
+        botSplit.setDividerLocation((int) (0.75 * WINDOW_WIDTH));
+        vertSplit.setDividerLocation((int) (0.6 * WINDOW_HEIGHT));
 
         //Add to frame
     }
