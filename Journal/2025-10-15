@@ -1,0 +1,13 @@
+This folder is for your meeting notes.
+
+A template for your meeting notes:
+
+    When: 10/15/2025 @ 4:00p
+    Who: Josh, Roger, Nat, Johnny
+    Where: In-person
+    What: 
+      Goals:
+        - Integrate weather system into main application window
+        - Begin work on QR Code generation
+        - Figure out how the java application will recieve the student's request to mark attendance.
+
