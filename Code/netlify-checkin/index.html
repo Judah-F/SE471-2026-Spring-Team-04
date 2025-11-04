@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeatherGuard Check-In</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .session-info {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .session-info p {
+            color: #4a5568;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .session-info strong {
+            color: #2d3748;
+        }
+
+        label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Attendance Check-In</h1>
+
+        <div class="session-info" id="sessionInfo">
+            <p><strong>Class:</strong> <span id="classId">Loading...</span></p>
+            <p><strong>Session:</strong> <span id="sessionId">Loading...</span></p>
+        </div>
+
+        <form id="checkinForm">
+            <label for="studentId">Student ID</label>
+            <input type="text" id="studentId" name="studentId" placeholder="e.g., S001" required>
+
+            <label for="studentName">Full Name</label>
+            <input type="text" id="studentName" name="studentName" placeholder="e.g., John Smith" required>
+
+            <button type="submit" id="submitBtn">Check In</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #4a5568;">Checking you in...</p>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // Extract URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const classId = urlParams.get('classId');
+        const sessionId = urlParams.get('sessionId');
+
+        // Display session info
+        document.getElementById('classId').textContent = classId || 'Unknown';
+        document.getElementById('sessionId').textContent = sessionId || 'Unknown';
+
+        // Handle form submission
+        document.getElementById('checkinForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const studentId = document.getElementById('studentId').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const messageDiv = document.getElementById('message');
+
+            // Validate
+            if (!classId || !sessionId) {
+                showMessage('Invalid QR code. Please scan again.', 'error');
+                return;
+            }
+
+            // Show loading
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+            messageDiv.style.display = 'none';
+
+            try {
+                // Call Netlify Function
+                const response = await fetch('/.netlify/functions/checkin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        classId,
+                        sessionId,
+                        studentId,
+                        studentName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('✅ Check-in successful! You can close this page.', 'success');
+                    document.getElementById('checkinForm').reset();
+                } else {
+                    showMessage(data.error || 'Check-in failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Please check your connection.', 'error');
+                console.error('Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

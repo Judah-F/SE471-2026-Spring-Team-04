@@ -1,0 +1,15 @@
+{
+  "name": "weatherguard-checkin",
+  "version": "1.0.0",
+  "description": "Student check-in interface for WeatherGuard attendance system",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "mongodb": "^6.10.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
