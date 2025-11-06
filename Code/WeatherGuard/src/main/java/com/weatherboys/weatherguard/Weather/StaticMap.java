@@ -42,7 +42,7 @@ public class StaticMap {
         }
 
         // Calculate tile coordinates (zoom 10 = city level view)
-        int zoom = 5;
+        int zoom = 10;
         int x = (int) Math.floor((lon + 180.0) / 360.0 * (1 << zoom));
         int y = (int) Math.floor((1.0 - Math.log(Math.tan(Math.toRadians(lat)) +
                 1.0 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2.0 * (1 << zoom));
@@ -61,7 +61,7 @@ public class StaticMap {
             // 2. Stack multiple weather layers
             // Order matters: drawn bottom to top
             // For extreme weather monitoring: temperature, precipitation, clouds
-            String[] layers = {"temp_new", "precipitation_new", "clouds_new"};
+            String[] layers = {/*"temp_new", "precipitation_new",*/ "clouds_new"};
 
             for (String layer : layers) {
                 try {
