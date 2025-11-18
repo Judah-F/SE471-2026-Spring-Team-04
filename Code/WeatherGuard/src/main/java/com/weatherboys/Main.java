@@ -16,33 +16,6 @@ import java.util.Properties;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        // Test Weather obj
-        Weather weather = Weather.fetchWeatherForCity("Tokyo");
-        System.out.println(weather);
-
-        // Test Forecast obj
-        Forecast forecast = Forecast.fetchForecastForLocation(weather.getLat(), weather.getLon());
-        System.out.println(forecast);
-
-        // Test StaticMap
-        testWeatherMap();
-
-        // Test QR Code Generator
-        try {
-            testQRCode();
-        } catch (Exception e) {
-            System.out.println("ERROR in testQRCode:");
-            e.printStackTrace();
-        }
-
-        // Test MongoDB
-        try {
-            testMongoDB();
-        } catch (Exception e) {
-            System.out.println("ERROR in testMongoDB:");
-            e.printStackTrace();
-        }
-
         SwingUtilities.invokeLater(WeatherGuard::new);
     }
 

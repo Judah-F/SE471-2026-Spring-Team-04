@@ -46,7 +46,7 @@ public class WeatherGuard extends JFrame implements ActionListener {
     private void createAndAddPanels() {
 
         // Use a GridLayout for a 2x2 arrangement
-        setLayout(new GridLayout(1, 1));
+        setLayout(new BorderLayout());
         setMinimumSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
 
         // Create displays for all desired information
@@ -55,20 +55,30 @@ public class WeatherGuard extends JFrame implements ActionListener {
         Panel_AttendanceData attendanceData = new Panel_AttendanceData();
         Panel_WeatherMap weatherMap = new Panel_WeatherMap();
 
-        topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceTable, weatherInformation);
-        botSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, attendanceData, weatherMap);
-        vertSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplit, botSplit); // Intellij complaining for no reason ;-;
+        JPanel grid = new JPanel(new GridLayout(2, 2, 6, 6));
+        grid.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        topSplit.setDividerSize(5);
-        botSplit.setDividerSize(5);
-        vertSplit.setDividerSize(5);
+        grid.add(attendanceTable);
+        grid.add(weatherInformation);
+        grid.add(attendanceData);
+        grid.add(weatherMap);
 
-        add(vertSplit);
+        JToolBar toolbar = new JToolBar();
+        toolbar.setFloatable(true);
+        toolbar.setLayout(new FlowLayout(FlowLayout.LEFT, 6,4));
 
-        topSplit.setDividerLocation((int) (0.75 * WINDOW_WIDTH));
-        botSplit.setDividerLocation((int) (0.75 * WINDOW_WIDTH));
-        vertSplit.setDividerLocation((int) (0.6 * WINDOW_HEIGHT));
+        JButton newBtn = new JButton("New");
+        JButton startSessionBtn = new JButton("Start Session");
+        JButton endSessionBtn = new JButton("End Session");
+        JButton addStudentBtn = new JButton("Add Student");
+
+        toolbar.add(newBtn);
+        toolbar.add(startSessionBtn);
+        toolbar.add(endSessionBtn);
+        toolbar.add(addStudentBtn);
 
         //Add to frame
+        add(toolbar, BorderLayout.SOUTH);
+        add(grid, BorderLayout.CENTER);
     }
 }
