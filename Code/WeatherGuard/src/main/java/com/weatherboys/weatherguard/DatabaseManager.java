@@ -185,7 +185,7 @@ public class DatabaseManager {
         try {
             attendanceCollection.find(Filters.eq("sessionId", sessionId))
                     .into(records);
-            logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for session: " + sessionId);
+            // logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for session: " + sessionId);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve attendance for session: " + sessionId, e);
         }
@@ -203,7 +203,7 @@ public class DatabaseManager {
         try {
             attendanceCollection.find(Filters.eq("classId", classId))
                     .into(records);
-            logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for class: " + classId);
+            // logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for class: " + classId);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve attendance for class: " + classId, e);
         }
@@ -359,7 +359,7 @@ public class DatabaseManager {
         try {
             studentsCollection.find(Filters.eq("classId", classId))
                     .into(students);
-            logger.log(Level.INFO, "Retrieved " + students.size() + " students for class: " + classId);
+            // logger.log(Level.INFO, "Retrieved " + students.size() + " students for class: " + classId);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve students for class: " + classId, e);
         }
