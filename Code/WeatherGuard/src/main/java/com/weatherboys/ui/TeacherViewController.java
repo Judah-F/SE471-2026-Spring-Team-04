@@ -32,6 +32,10 @@ public class TeacherViewController implements Initializable {
     // Weather service facade (ONLY import we need for weather!)
     private WeatherService weatherService;
 
+    // Store current temperatures (both F and C from Weather object)
+    private int currentTempFahrenheit;
+    private int currentTempCelsius;
+
     // Buttons
     @FXML
     private Button startSessionButton;
@@ -88,6 +92,31 @@ public class TeacherViewController implements Initializable {
     }
 
     /**
+     * Sets the class information and temperature unit preference
+     * (called when returning from FiveDayForecastView)
+     *
+     * @param classInfo The class data to display
+     * @param useFahrenheit Whether to display temperature in Fahrenheit
+     */
+    public void setClassInfo(ClassInfo classInfo, boolean useFahrenheit) {
+        this.selectedClass = classInfo;
+
+        // Initialize WeatherService facade with city from class
+        initializeWeather();
+
+        // Set temperature unit preference in the facade
+        if (weatherService != null) {
+            weatherService.setTemperatureUnit(useFahrenheit);
+        }
+
+        // Update temperature display with the correct unit
+        updateTemperatureDisplay();
+
+        // TODO: Load students from database for this class
+        // TODO: Populate student labels
+    }
+
+    /**
      * Initializes WeatherService and loads weather data
      * Uses Facade pattern - only interacts with WeatherService, not individual weather classes
      */
@@ -113,6 +142,16 @@ public class TeacherViewController implements Initializable {
     }
 
     /**
+     * Updates the temperature display based on current unit preference in WeatherService
+     */
+    private void updateTemperatureDisplay() {
+        if (weatherService != null && temp2 != null) {
+            String formattedTemp = weatherService.getFormattedTemperature(currentTempFahrenheit, currentTempCelsius);
+            temp2.setText(formattedTemp);
+        }
+    }
+
+    /**
      * Displays weather information in the UI
      * @param weatherData Map containing weather, forecast, and map from WeatherService
      */
@@ -129,8 +168,12 @@ public class TeacherViewController implements Initializable {
                 name2.setText(weather.getClass().getMethod("getName").invoke(weather).toString());
                 description2.setText(weather.getClass().getMethod("getDescription").invoke(weather).toString());
 
-                Object temp = weather.getClass().getMethod("getCurrentTemp").invoke(weather);
-                // Temperature display will be handled by temp2 button
+                // Store both F and C temperatures from Weather object
+                currentTempFahrenheit = (Integer) weather.getClass().getMethod("getCurrentTemp").invoke(weather);
+                currentTempCelsius = (Integer) weather.getClass().getMethod("getCurrentTempC").invoke(weather);
+
+                // Display temperature using WeatherService facade
+                updateTemperatureDisplay();
 
                 Object humidity = weather.getClass().getMethod("getHumidity").invoke(weather);
                 humid2.setText(humidity + "%");
@@ -201,15 +244,19 @@ public class TeacherViewController implements Initializable {
                 String cityName = (String) weather.getClass().getMethod("getName").invoke(weather);
                 String country = (String) weather.getClass().getMethod("getCountry").invoke(weather);
 
-                FiveDayForecastController.setCurrentForecast(forecast, cityName, country);
+                // Pass forecast data WITH temperature unit preference (from WeatherService) and ClassInfo
+                boolean isFahrenheit = weatherService.isUsingFahrenheit();
+                FiveDayForecastController.setCurrentForecast(forecast, cityName, country, isFahrenheit, selectedClass);
             }
 
             // Load FiveDayForecastView
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/FiveDayForecastView.fxml"));
             Stage stage = (Stage) fiveDayForecastButton2.getScene().getWindow();
-            Scene scene = new Scene(root, 900, 600);
+            Scene scene = new Scene(root); // Let it use FXML's preferred size (600x350)
             stage.setScene(scene);
+            stage.sizeToScene();
             stage.centerOnScreen();
+            stage.setResizable(false);
             stage.show();
 
         } catch (Exception e) {
@@ -221,7 +268,14 @@ public class TeacherViewController implements Initializable {
 
     @FXML
     public void toggleTemperatureUnit(ActionEvent event) {
-        // TODO: Implement toggleTemperatureUnit logic (Fahrenheit/Celsius toggle)
+        // Toggle temperature unit preference in WeatherService facade
+        if (weatherService != null) {
+            boolean currentUnit = weatherService.isUsingFahrenheit();
+            weatherService.setTemperatureUnit(!currentUnit);
+
+            // Update the temperature display
+            updateTemperatureDisplay();
+        }
     }
 
     /**

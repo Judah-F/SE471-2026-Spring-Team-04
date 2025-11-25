@@ -29,6 +29,7 @@ public class WeatherService {
     // Configuration
     private String apiKey;
     private String city;
+    private boolean useFahrenheit;
 
     /**
      * Constructor for WeatherService
@@ -46,6 +47,7 @@ public class WeatherService {
 
         this.apiKey = apiKey;
         this.city = city;
+        this.useFahrenheit = true; // Default to Fahrenheit
 
         // Initialize all weather data on construction
         refreshAllData();
@@ -166,6 +168,34 @@ public class WeatherService {
 
     public String getApiKey() {
         return apiKey;
+    }
+
+    public boolean isUsingFahrenheit() {
+        return useFahrenheit;
+    }
+
+    /**
+     * Set temperature unit preference
+     *
+     * @param useFahrenheit true for Fahrenheit, false for Celsius
+     */
+    public void setTemperatureUnit(boolean useFahrenheit) {
+        this.useFahrenheit = useFahrenheit;
+    }
+
+    /**
+     * Get formatted temperature string based on current unit preference
+     *
+     * @param tempFahrenheit Temperature in Fahrenheit
+     * @param tempCelsius Temperature in Celsius
+     * @return Formatted temperature string with unit symbol
+     */
+    public String getFormattedTemperature(int tempFahrenheit, int tempCelsius) {
+        if (useFahrenheit) {
+            return tempFahrenheit + "°F";
+        } else {
+            return tempCelsius + "°C";
+        }
     }
 
     /**

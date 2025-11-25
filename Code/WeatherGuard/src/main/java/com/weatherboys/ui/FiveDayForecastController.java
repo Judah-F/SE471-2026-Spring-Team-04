@@ -25,6 +25,7 @@ public class FiveDayForecastController implements Initializable {
     private static Forecast currentForecast;
     private static String locationStr, forecastCountry;
     private static boolean useFahrenheit = true;
+    private static com.weatherboys.model.ClassInfo classInfo;
 
     @FXML
     private Label high1, high2, high3, high4, high5;
@@ -55,6 +56,15 @@ public class FiveDayForecastController implements Initializable {
         locationStr = location;
         forecastCountry = country;
         useFahrenheit = true;
+    }
+
+    // Sets forecast with location info and temperature unit preference
+    public static void setCurrentForecast(Forecast forecast, String location, String country, boolean isFahrenheit, com.weatherboys.model.ClassInfo clsInfo) {
+        currentForecast = forecast;
+        locationStr = location;
+        forecastCountry = country;
+        useFahrenheit = isFahrenheit;
+        classInfo = clsInfo;
     }
 
     // Sets the label text with the formatted temperature
@@ -130,7 +140,24 @@ public class FiveDayForecastController implements Initializable {
     // Switches to the main view
     @FXML
     public void switchToMainView(ActionEvent event) throws IOException {
-        switchView(event, "TeacherView.fxml", 900, 600);
+        // Load TeacherView and pass back the ClassInfo
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TeacherView.fxml"));
+        Parent root = loader.load();
+
+        // Get the controller and pass the class data AND temperature preference back
+        if (classInfo != null) {
+            TeacherViewController controller = loader.getController();
+            controller.setClassInfo(classInfo, useFahrenheit);
+        }
+
+        // Switch to TeacherView
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root, 900, 600);
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.sizeToScene();
+        stage.setResizable(false);
+        stage.show();
     }
 
     // Helper method to switch views
