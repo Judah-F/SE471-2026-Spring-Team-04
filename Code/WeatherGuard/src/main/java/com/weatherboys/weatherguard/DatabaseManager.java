@@ -41,16 +41,12 @@ public class DatabaseManager {
      * @param databaseName Name of the database to use
      */
     public DatabaseManager(String connectionString, String databaseName) {
-        logger.log(Level.INFO, "Connecting to MongoDB: " + connectionString);
-
         this.mongoClient = MongoClients.create(connectionString);
         this.database = mongoClient.getDatabase(databaseName);
         this.sessionsCollection = database.getCollection("sessions");
         this.attendanceCollection = database.getCollection("attendance");
         this.classesCollection = database.getCollection("classes");
         this.studentsCollection = database.getCollection("students");
-
-        logger.log(Level.INFO, "Connected to database: " + databaseName);
     }
 
     /**
@@ -72,7 +68,6 @@ public class DatabaseManager {
                 }
 
                 instance = new DatabaseManager(connectionString, databaseName);
-                logger.log(Level.INFO, "DatabaseManager singleton created");
             } catch (IOException e) {
                 logger.log(Level.SEVERE, "Failed to load configuration", e);
                 throw new RuntimeException("Failed to initialize DatabaseManager", e);
@@ -90,7 +85,6 @@ public class DatabaseManager {
         List<Document> classes = new ArrayList<>();
         try {
             classesCollection.find().into(classes);
-            logger.log(Level.INFO, "Retrieved " + classes.size() + " classes from database");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve classes", e);
         }
@@ -106,7 +100,6 @@ public class DatabaseManager {
         List<Document> classes = new ArrayList<>();
         try {
             classesCollection.find(Filters.eq("active", true)).into(classes);
-            logger.log(Level.INFO, "Retrieved " + classes.size() + " active classes from database");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve active classes", e);
         }
@@ -312,14 +305,6 @@ public class DatabaseManager {
             // Check if class already exists
             Document existing = classesCollection.find(Filters.eq("classId", classId)).first();
             if (existing != null) {
-                boolean wasActive = existing.getBoolean("active", true);
-
-                if (wasActive) {
-                    logger.log(Level.WARNING, "Active class already exists: " + classId + ". Updating and replacing students.");
-                } else {
-                    logger.log(Level.INFO, "Reactivating inactive class: " + classId);
-                }
-
                 // Update existing class document and set active = true
                 classesCollection.replaceOne(Filters.eq("classId", classId), classDoc);
 
@@ -328,7 +313,6 @@ public class DatabaseManager {
             } else {
                 // Insert new class
                 classesCollection.insertOne(classDoc);
-                logger.log(Level.INFO, "Class created: " + classId + " - " + className);
             }
 
             // Skip blank line and header
@@ -353,7 +337,6 @@ public class DatabaseManager {
                 }
             }
 
-            logger.log(Level.INFO, "Uploaded " + studentCount + " students for class: " + classId);
             return true;
 
         } catch (IOException e) {
@@ -450,14 +433,13 @@ public class DatabaseManager {
             ).getModifiedCount();
 
             if (modifiedCount > 0) {
-                logger.log(Level.INFO, "Successfully soft deleted (deactivated) class: " + classId);
                 return true;
             } else {
-                logger.log(Level.WARNING, "Class not found for soft deletion: " + classId);
+                logger.log(Level.WARNING, "Class not found for deletion: " + classId);
                 return false;
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to soft delete class: " + classId, e);
+            logger.log(Level.SEVERE, "Failed to delete class: " + classId, e);
             return false;
         }
     }
@@ -469,7 +451,6 @@ public class DatabaseManager {
     public void close() {
         if (mongoClient != null) {
             mongoClient.close();
-            logger.log(Level.INFO, "MongoDB connection closed");
         }
     }
 }

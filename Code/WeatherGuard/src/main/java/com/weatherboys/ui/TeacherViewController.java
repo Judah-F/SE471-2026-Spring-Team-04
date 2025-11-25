@@ -53,8 +53,6 @@ public class TeacherViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("TeacherViewController initialized");
-
         // Note: selectedClass will be set via setClassInfo() after initialize()
         // We'll load data in setClassInfo() instead
     }
@@ -66,13 +64,6 @@ public class TeacherViewController implements Initializable {
      */
     public void setClassInfo(ClassInfo classInfo) {
         this.selectedClass = classInfo;
-
-        // Log the class data
-        System.out.println("TeacherView loaded for class: " + classInfo.getClassName());
-        System.out.println("  Class ID: " + classInfo.getClassId());
-        System.out.println("  Semester: " + classInfo.getFormattedSemester());
-        System.out.println("  City: " + classInfo.getCity());
-        System.out.println("  Professor: " + classInfo.getProfessorName());
 
         // TODO: Initialize WeatherService with city
         // TODO: Load students from database for this class

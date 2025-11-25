@@ -45,8 +45,6 @@ public class AdminViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.println("AdminViewController initialized");
-
         // Initialize database manager
         dbManager = DatabaseManager.getInstance();
 
@@ -90,7 +88,6 @@ public class AdminViewController implements Initializable {
 
         // Set the data to TableView
         adminTable.setItems(classList);
-        System.out.println("Loaded " + classList.size() + " active classes into table");
     }
 
     /**
@@ -109,8 +106,6 @@ public class AdminViewController implements Initializable {
 
             viewClassesMenuButton.getItems().add(classItem);
         }
-
-        System.out.println("Populated MenuButton with " + classList.size() + " class options");
     }
 
     @FXML
@@ -206,8 +201,6 @@ public class AdminViewController implements Initializable {
             stage.setScene(scene);
             stage.centerOnScreen();
             stage.show();
-
-            System.out.println("Navigated to TeacherView for class: " + classInfo.getClassId());
 
         } catch (IOException e) {
             e.printStackTrace();
