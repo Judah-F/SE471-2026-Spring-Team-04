@@ -5,7 +5,7 @@ Sample class roster CSV files for testing WeatherGuard functionality.
 ## Class Roster Format
 
 Each class has ONE CSV file containing:
-1. **Class metadata** (first 7 rows)
+1. **Class metadata** (first 8 rows)
 2. **Student roster** (remaining rows)
 
 ### Example: BIO101_Roster.csv
@@ -17,6 +17,7 @@ Year,2025
 StartDate,2025-08-25
 EndDate,2025-12-15
 ProfessorName,Dr. Anderson
+City,San Diego
 
 StudentName,StudentID
 John Smith,S001
@@ -30,12 +31,14 @@ Jane Doe,S002
 - **Class**: Biology 101
 - **Professor**: Dr. Anderson
 - **Semester**: Fall 2025
+- **City**: San Diego
 - **Students**: 5 students (S001-S005)
 
 ### CHEM201_Roster.csv
 - **Class**: Chemistry 201
 - **Professor**: Prof. Johnson
 - **Semester**: Fall 2025
+- **City**: Los Angeles
 - **Students**: 5 students (S006-S010)
 
 ## Usage

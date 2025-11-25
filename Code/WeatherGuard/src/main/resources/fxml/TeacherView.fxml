@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<SplitPane dividerPositions="0.06856187290969899" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.weatherboys.ui.TeacherViewController">
+<items>
+    <AnchorPane maxHeight="40.0" minHeight="40.0" minWidth="0.0" prefHeight="40.0" prefWidth="600.0" style="-fx-background-color: darkgray;">
+        <children>
+
+            <Line endX="928.0" startX="-100.0" strokeLineCap="ROUND" strokeWidth="2.0" />
+            <Label alignment="CENTER" layoutX="300.0" prefHeight="40.0" prefWidth="300.0" text="Welcome to Weather Guard" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS">
+                <font>
+                    <Font name="Trebuchet MS" size="21.0" />
+                </font>
+            </Label>
+            <Button fx:id="adminViewButton" layoutX="22.0" layoutY="8.0" mnemonicParsing="false" onAction="#switchToAdminView" style="-fx-background-color: #9B6B6B;" text="Admin View" />
+        </children>
+    </AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="598.0">
+        <children>
+            <HBox prefHeight="555.0" prefWidth="900.0">
+                <children>
+                    <SplitPane dividerPositions="0.5" maxHeight="555.0" maxWidth="300.0" minHeight="555.0" minWidth="300.0" prefHeight="555.0" prefWidth="300.0" style="-fx-background-color: darkgray;">
+                        <items>
+                            <AnchorPane minHeight="0.0" minWidth="300.0" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: darkgray;">
+                           <children>
+                              <Label fx:id="classNameLabel" alignment="CENTER" layoutX="61.0" prefHeight="25.0" prefWidth="179.0" text="Biology 101" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Tahoma" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="classIDLabel" alignment="CENTER" layoutX="61.0" layoutY="30.0" prefHeight="23.0" prefWidth="179.0" text="BIO101" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Comic Sans MS" size="18.0" />
+                                 </font>
+                              </Label>
+                              <Button fx:id="startSessionButton" layoutX="106.0" layoutY="84.0" mnemonicParsing="false" onAction="#startSession" style="-fx-background-color: #6B8E6B;" text="Start Session" />
+                              <Label fx:id="professorLabel" alignment="CENTER" layoutX="96.0" layoutY="55.0" prefHeight="23.0" prefWidth="179.0" text="Dr. Anderson" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="18.0" />
+                                 </font>
+                              </Label>
+                              <Button fx:id="endSessionButton" layoutX="109.0" layoutY="86.0" mnemonicParsing="false" onAction="#endSession" style="-fx-background-color: #9B6B6B;" text="End Session" />
+                              <Label alignment="CENTER" layoutX="11.0" layoutY="54.0" prefHeight="23.0" prefWidth="101.0" text="Professor:" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label alignment="CENTER" layoutX="11.0" layoutY="105.0" prefHeight="8.0" prefWidth="80.0" text="Students:" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_00" alignment="CENTER" layoutY="126.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_17" alignment="CENTER" layoutX="149.0" layoutY="126.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_01" alignment="CENTER" layoutY="151.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_18" alignment="CENTER" layoutX="149.0" layoutY="151.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_02" alignment="CENTER" layoutY="176.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_19" alignment="CENTER" layoutX="149.0" layoutY="176.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_03" alignment="CENTER" layoutY="201.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_20" alignment="CENTER" layoutX="149.0" layoutY="201.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_04" alignment="CENTER" layoutY="226.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_21" alignment="CENTER" layoutX="149.0" layoutY="226.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_05" alignment="CENTER" layoutY="251.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_22" alignment="CENTER" layoutX="149.0" layoutY="251.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_06" alignment="CENTER" layoutY="276.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_23" alignment="CENTER" layoutX="149.0" layoutY="276.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_07" alignment="CENTER" layoutY="301.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_24" alignment="CENTER" layoutX="149.0" layoutY="301.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_08" alignment="CENTER" layoutY="326.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_25" alignment="CENTER" layoutX="149.0" layoutY="326.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_09" alignment="CENTER" layoutY="351.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_26" alignment="CENTER" layoutX="149.0" layoutY="351.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_10" alignment="CENTER" layoutY="376.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_27" alignment="CENTER" layoutX="149.0" layoutY="376.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_11" alignment="CENTER" layoutY="401.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_28" alignment="CENTER" layoutX="149.0" layoutY="401.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_12" alignment="CENTER" layoutY="426.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_29" alignment="CENTER" layoutX="149.0" layoutY="426.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_13" alignment="CENTER" layoutY="451.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_30" alignment="CENTER" layoutX="149.0" layoutY="451.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_14" alignment="CENTER" layoutY="476.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_31" alignment="CENTER" layoutX="149.0" layoutY="476.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_15" alignment="CENTER" layoutY="501.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_32" alignment="CENTER" layoutX="149.0" layoutY="501.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_16" alignment="CENTER" layoutY="526.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="student_33" alignment="CENTER" layoutX="149.0" layoutY="526.0" prefHeight="23.0" prefWidth="147.0" text="John Smith, S001" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Verdana" size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                            </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="356.0" prefWidth="140.0" />
+                        </items>
+                    </SplitPane>
+                    <SplitPane dividerPositions="0.5" prefHeight="600.0" prefWidth="300.0">
+                        <items>
+                            <AnchorPane minHeight="0.0" minWidth="300.0" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: darkgray;">
+                           <children>
+                              <SplitPane dividerPositions="0.5" layoutX="-2.0" layoutY="1.0" orientation="VERTICAL" prefHeight="552.0" prefWidth="308.0" style="-fx-background-color: darkgray;">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="269.0" prefWidth="298.0">
+                                       <children>
+                                          <ImageView fx:id="sessionQRCode" fitHeight="272.0" fitWidth="285.0" layoutX="16.0" pickOnBounds="true" preserveRatio="true" />
+                                          <PieChart fx:id="sessionPieChart" prefHeight="272.0" prefWidth="306.0" />
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="136.0" prefWidth="167.0">
+                                       <children>
+                                          <ImageView fx:id="sessionStaticMap" fitHeight="272.0" fitWidth="285.0" layoutX="15.0" pickOnBounds="true" preserveRatio="true" />
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                            </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                        </items>
+                    </SplitPane>
+                    <AnchorPane prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: darkgray;">
+                        <children>
+                            <Button fx:id="fiveDayForecastButton2" layoutX="99.0" layoutY="120.0" mnemonicParsing="false" onAction="#switchToFiveDayForecastView" style="-fx-background-color: #6B8E6B;" text="5 Day Forecast">
+                                <font>
+                                    <Font name="Lucida Sans Unicode" size="12.0" />
+                                </font>
+                            </Button>
+                            <Label fx:id="sunRise2" layoutX="14.0" layoutY="447.0" prefHeight="30.0" prefWidth="80.0" text="12:55 AM">
+                                <font>
+                                    <Font name="Lucida Sans Unicode" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="sunSet2" alignment="CENTER_RIGHT" layoutX="200.0" layoutY="447.0" prefHeight="30.0" prefWidth="80.0" text="12:55 PM">
+                                <font>
+                                    <Font name="Lucida Sans Unicode" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="date2" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="75.0" layoutY="469.0" prefHeight="60.0" prefWidth="147.0" text="September 30, 11:52pm " textAlignment="CENTER" wrapText="true">
+                                <font>
+                                    <Font name="Verdana" size="19.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="wind2" alignment="CENTER_RIGHT" layoutX="165.0" layoutY="386.0" prefHeight="40.0" prefWidth="115.0" text="555 mph" wrapText="true">
+                                <font>
+                                    <Font name="Verdana" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="humid2" layoutX="14.0" layoutY="386.0" prefHeight="40.0" prefWidth="138.0" text="100% Humidity" textAlignment="CENTER" textOverrun="CENTER_WORD_ELLIPSIS" wrapText="true">
+                                <font>
+                                    <Font name="Verdana" size="16.0" />
+                                </font>
+                            </Label>
+                            <Button fx:id="temp2" alignment="CENTER" contentDisplay="CENTER" ellipsisString="" graphicTextGap="1.0" layoutX="164.0" layoutY="210.0" mnemonicParsing="false" onAction="#toggleTemperatureUnit" prefHeight="80.0" prefWidth="115.0" style="-fx-background-color: #4A9B9B;" text="102˚F" textAlignment="CENTER" textOverrun="CLIP" wrapText="true">
+                                <font>
+                                    <Font name="Comic Sans MS" size="36.0" />
+                                </font>
+                                <padding>
+                                    <Insets left="-2.0" />
+                                </padding>
+                                <opaqueInsets>
+                                    <Insets />
+                                </opaqueInsets>
+                            </Button>
+                            <Label fx:id="name2" alignment="CENTER" layoutX="9.0" layoutY="51.0" prefHeight="60.0" prefWidth="278.0" text="Calsbad, CA">
+                                <font>
+                                    <Font name="Tahoma" size="30.0" />
+                                </font>
+                            </Label>
+                            <ImageView fx:id="weatherIcon2" fitHeight="125.0" fitWidth="125.0" layoutX="11.0" layoutY="175.0" pickOnBounds="true" preserveRatio="true" />
+                            <Label fx:id="description2" alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="3.0" layoutY="286.0" prefHeight="72.0" prefWidth="138.0" text="scattered clouds with wind warnings" textAlignment="CENTER" wrapText="true">
+                                <font>
+                                    <Font name="Comic Sans MS" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="sunriseLabel2" layoutX="21.0" layoutY="519.0" text="Sunrise">
+                                <font>
+                                    <Font name="Comic Sans MS" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label fx:id="sunsetLabel2" layoutX="220.0" layoutY="519.0" text="Sunset">
+                                <font>
+                                    <Font name="Comic Sans MS" size="16.0" />
+                                </font>
+                            </Label>
+                        <ImageView fx:id="sunRiseImage" fitHeight="48.0" fitWidth="48.0" layoutX="25.0" layoutY="474.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="sunSetImage" fitHeight="48.0" fitWidth="48.0" layoutX="222.0" layoutY="475.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="humidityImage" fitHeight="64.0" fitWidth="64.0" layoutX="40.0" layoutY="326.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="windImage" fitHeight="64.0" fitWidth="64.0" layoutX="208.0" layoutY="326.0" pickOnBounds="true" preserveRatio="true" />
+                        </children>
+                    </AnchorPane>
+                </children>
+            </HBox>
+        </children>
+    </AnchorPane>
+</items>
+</SplitPane>

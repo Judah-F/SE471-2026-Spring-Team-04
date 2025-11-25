@@ -1,5 +1,7 @@
 plugins {
     id("java")
+    id("application")
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 group = "com.weatherboys"
@@ -7,6 +9,15 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+javafx {
+    version = "21"
+    modules = listOf("javafx.controls", "javafx.fxml", "javafx.swing")
+}
+
+application {
+    mainClass.set("com.weatherboys.Launcher")
 }
 
 dependencies {
@@ -20,10 +31,12 @@ dependencies {
     // MongoDB Java driver
     implementation("org.mongodb:mongodb-driver-sync:5.2.1")
 
+    // SLF4J logging for MongoDB driver
+    implementation("org.slf4j:slf4j-simple:2.0.9")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	implementation("org.json:json:20240303")
 }
 
 tasks.test {

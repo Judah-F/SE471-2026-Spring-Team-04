@@ -66,14 +66,14 @@ public class QRCodeGenerator {
         String checkInUrl = String.format("%s?classId=%s&sessionId=%s",
             baseUrl.trim(), classId.trim(), sessionId);
 
-        logger.log(Level.INFO, "Generating QR code for URL: " + checkInUrl);
+        // logger.log(Level.INFO, "Generating QR code for URL: " + checkInUrl);
 
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(checkInUrl, BarcodeFormat.QR_CODE, width, height);
             BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
 
-            logger.log(Level.INFO, "QR code generated successfully for class: " + classId);
+            // logger.log(Level.INFO, "QR code generated successfully for class: " + classId);
             return qrImage;
 
         } catch (WriterException e) {

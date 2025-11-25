@@ -3,6 +3,7 @@ package com.weatherboys.weatherguard;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.weatherboys.weatherguard.Weather.ConfigManager;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -12,16 +13,20 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * DatabaseManager handles all MongoDB operations for WeatherGuard attendance system.
  * Manages connections, sessions, and attendance records in MongoDB.
+ * Implements Singleton pattern for shared database access across controllers.
  */
 public class DatabaseManager {
 
     private static final Logger logger = Logger.getLogger(DatabaseManager.class.getName());
+    private static DatabaseManager instance = null;
+
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> sessionsCollection;
@@ -36,16 +41,69 @@ public class DatabaseManager {
      * @param databaseName Name of the database to use
      */
     public DatabaseManager(String connectionString, String databaseName) {
-        logger.log(Level.INFO, "Connecting to MongoDB: " + connectionString);
-
         this.mongoClient = MongoClients.create(connectionString);
         this.database = mongoClient.getDatabase(databaseName);
         this.sessionsCollection = database.getCollection("sessions");
         this.attendanceCollection = database.getCollection("attendance");
         this.classesCollection = database.getCollection("classes");
         this.studentsCollection = database.getCollection("students");
+    }
 
-        logger.log(Level.INFO, "Connected to database: " + databaseName);
+    /**
+     * Gets the singleton instance of DatabaseManager.
+     * Loads configuration from config.properties and creates instance if needed.
+     *
+     * @return The DatabaseManager singleton instance
+     */
+    public static synchronized DatabaseManager getInstance() {
+        if (instance == null) {
+            try {
+                Properties config = ConfigManager.loadConfig();
+                String connectionString = config.getProperty("mongoConnectionString");
+                String databaseName = config.getProperty("mongoDatabaseName");
+
+                if (connectionString == null || databaseName == null) {
+                    logger.log(Level.SEVERE, "MongoDB configuration missing in config.properties");
+                    throw new RuntimeException("MongoDB configuration not found");
+                }
+
+                instance = new DatabaseManager(connectionString, databaseName);
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load configuration", e);
+                throw new RuntimeException("Failed to initialize DatabaseManager", e);
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * Gets all classes from the database.
+     *
+     * @return List of all class documents
+     */
+    public List<Document> getAllClasses() {
+        List<Document> classes = new ArrayList<>();
+        try {
+            classesCollection.find().into(classes);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to retrieve classes", e);
+        }
+        return classes;
+    }
+
+    /**
+     * Gets only active classes from the database (soft delete support).
+     *
+     * @return List of active class documents
+     */
+    public List<Document> getActiveClasses() {
+        List<Document> classes = new ArrayList<>();
+        try {
+            classesCollection.find(Filters.eq("active", true)).into(classes);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to retrieve active classes", e);
+        }
+        return classes;
     }
 
     /**
@@ -127,7 +185,7 @@ public class DatabaseManager {
         try {
             attendanceCollection.find(Filters.eq("sessionId", sessionId))
                     .into(records);
-            logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for session: " + sessionId);
+            // logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for session: " + sessionId);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve attendance for session: " + sessionId, e);
         }
@@ -145,7 +203,7 @@ public class DatabaseManager {
         try {
             attendanceCollection.find(Filters.eq("classId", classId))
                     .into(records);
-            logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for class: " + classId);
+            // logger.log(Level.INFO, "Retrieved " + records.size() + " attendance records for class: " + classId);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve attendance for class: " + classId, e);
         }
@@ -213,7 +271,7 @@ public class DatabaseManager {
     /**
      * Uploads a class roster from CSV file and stores in MongoDB.
      * CSV Format:
-     * - First 7 rows: Class metadata (ClassName, ClassID, Semester, Year, StartDate, EndDate, ProfessorName)
+     * - First 8 rows: Class metadata (ClassName, ClassID, Semester, Year, StartDate, EndDate, ProfessorName, City)
      * - Blank row
      * - Header row: StudentName,StudentID
      * - Student rows: Name,ID
@@ -223,7 +281,7 @@ public class DatabaseManager {
      */
     public boolean uploadRosterCsv(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // Parse class metadata (first 7 lines)
+            // Parse class metadata (first 8 lines)
             String className = br.readLine().split(",", 2)[1].trim();
             String classId = br.readLine().split(",", 2)[1].trim();
             String semester = br.readLine().split(",", 2)[1].trim();
@@ -231,26 +289,31 @@ public class DatabaseManager {
             String startDate = br.readLine().split(",", 2)[1].trim();
             String endDate = br.readLine().split(",", 2)[1].trim();
             String professorName = br.readLine().split(",", 2)[1].trim();
+            String city = br.readLine().split(",", 2)[1].trim();
 
-            // Create class document
+            // Create class document with active flag
             Document classDoc = new Document("classId", classId)
                     .append("className", className)
                     .append("semester", semester)
                     .append("year", year)
                     .append("startDate", startDate)
                     .append("endDate", endDate)
-                    .append("professorName", professorName);
+                    .append("professorName", professorName)
+                    .append("city", city)
+                    .append("active", true);
 
             // Check if class already exists
             Document existing = classesCollection.find(Filters.eq("classId", classId)).first();
             if (existing != null) {
-                logger.log(Level.WARNING, "Class already exists: " + classId + ". Deleting old class and students.");
-                classesCollection.deleteOne(Filters.eq("classId", classId));
-                studentsCollection.deleteMany(Filters.eq("classId", classId));
-            }
+                // Update existing class document and set active = true
+                classesCollection.replaceOne(Filters.eq("classId", classId), classDoc);
 
-            classesCollection.insertOne(classDoc);
-            logger.log(Level.INFO, "Class created: " + classId + " - " + className);
+                // Delete old students to replace with new roster
+                studentsCollection.deleteMany(Filters.eq("classId", classId));
+            } else {
+                // Insert new class
+                classesCollection.insertOne(classDoc);
+            }
 
             // Skip blank line and header
             br.readLine(); // blank line
@@ -274,7 +337,6 @@ public class DatabaseManager {
                 }
             }
 
-            logger.log(Level.INFO, "Uploaded " + studentCount + " students for class: " + classId);
             return true;
 
         } catch (IOException e) {
@@ -297,7 +359,7 @@ public class DatabaseManager {
         try {
             studentsCollection.find(Filters.eq("classId", classId))
                     .into(students);
-            logger.log(Level.INFO, "Retrieved " + students.size() + " students for class: " + classId);
+            // logger.log(Level.INFO, "Retrieved " + students.size() + " students for class: " + classId);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to retrieve students for class: " + classId, e);
         }
@@ -355,13 +417,40 @@ public class DatabaseManager {
     }
 
     /**
+     * Soft deletes a class by setting its active flag to false.
+     * This preserves historical data while hiding the class from active views.
+     * Students enrolled in the class remain in the database for historical reporting.
+     *
+     * @param classId The class identifier to soft delete
+     * @return true if successful, false otherwise
+     */
+    public boolean deleteClass(String classId) {
+        try {
+            // Set active = false instead of actually deleting
+            long modifiedCount = classesCollection.updateOne(
+                Filters.eq("classId", classId),
+                Updates.set("active", false)
+            ).getModifiedCount();
+
+            if (modifiedCount > 0) {
+                return true;
+            } else {
+                logger.log(Level.WARNING, "Class not found for deletion: " + classId);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to delete class: " + classId, e);
+            return false;
+        }
+    }
+
+    /**
      * Closes the MongoDB connection.
      * Should be called when shutting down the application.
      */
     public void close() {
         if (mongoClient != null) {
             mongoClient.close();
-            logger.log(Level.INFO, "MongoDB connection closed");
         }
     }
 }
