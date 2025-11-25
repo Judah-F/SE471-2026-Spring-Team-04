@@ -213,7 +213,7 @@ public class DatabaseManager {
     /**
      * Uploads a class roster from CSV file and stores in MongoDB.
      * CSV Format:
-     * - First 7 rows: Class metadata (ClassName, ClassID, Semester, Year, StartDate, EndDate, ProfessorName)
+     * - First 8 rows: Class metadata (ClassName, ClassID, Semester, Year, StartDate, EndDate, ProfessorName, City)
      * - Blank row
      * - Header row: StudentName,StudentID
      * - Student rows: Name,ID
@@ -223,7 +223,7 @@ public class DatabaseManager {
      */
     public boolean uploadRosterCsv(String filePath) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            // Parse class metadata (first 7 lines)
+            // Parse class metadata (first 8 lines)
             String className = br.readLine().split(",", 2)[1].trim();
             String classId = br.readLine().split(",", 2)[1].trim();
             String semester = br.readLine().split(",", 2)[1].trim();
@@ -231,6 +231,7 @@ public class DatabaseManager {
             String startDate = br.readLine().split(",", 2)[1].trim();
             String endDate = br.readLine().split(",", 2)[1].trim();
             String professorName = br.readLine().split(",", 2)[1].trim();
+            String city = br.readLine().split(",", 2)[1].trim();
 
             // Create class document
             Document classDoc = new Document("classId", classId)
@@ -239,7 +240,8 @@ public class DatabaseManager {
                     .append("year", year)
                     .append("startDate", startDate)
                     .append("endDate", endDate)
-                    .append("professorName", professorName);
+                    .append("professorName", professorName)
+                    .append("city", city);
 
             // Check if class already exists
             Document existing = classesCollection.find(Filters.eq("classId", classId)).first();
