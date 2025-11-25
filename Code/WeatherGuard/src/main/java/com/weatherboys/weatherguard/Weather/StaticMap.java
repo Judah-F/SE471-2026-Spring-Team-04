@@ -42,7 +42,7 @@ public class StaticMap {
         }
 
         // Calculate tile coordinates (zoom 10 = city level view)
-        int zoom = 5;
+        int zoom = 7;
         int x = (int) Math.floor((lon + 180.0) / 360.0 * (1 << zoom));
         int y = (int) Math.floor((1.0 - Math.log(Math.tan(Math.toRadians(lat)) +
                 1.0 / Math.cos(Math.toRadians(lat))) / Math.PI) / 2.0 * (1 << zoom));

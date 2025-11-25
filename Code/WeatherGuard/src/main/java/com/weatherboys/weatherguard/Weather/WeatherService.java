@@ -121,7 +121,7 @@ public class WeatherService {
         allData.put("forecast", f);
         allData.put("map", m);
 
-        logger.log(Level.INFO, "Retrieved all weather info for city: " + city);
+        // logger.log(Level.INFO, "Retrieved all weather info for city: " + city);
 
         return allData;
     }
@@ -131,7 +131,7 @@ public class WeatherService {
      * Useful when you want to update the weather information
      */
     public void refreshAllData() {
-        logger.log(Level.INFO, "Refreshing all weather data for city: " + city);
+        // logger.log(Level.INFO, "Refreshing all weather data for city: " + city);
 
         // Fetch fresh weather data
         weather = Weather.fetchWeatherForCity(city);
@@ -140,7 +140,7 @@ public class WeatherService {
         if (weather != null && !weather.isEmpty()) {
             forecast = Forecast.fetchForecastForLocation(weather.getLat(), weather.getLon());
             staticMap = StaticMap.fetchMapForLocation(weather.getLat(), weather.getLon());
-            logger.log(Level.INFO, "Successfully refreshed all weather data");
+            // logger.log(Level.INFO, "Successfully refreshed all weather data");
         } else {
             logger.log(Level.SEVERE, "Failed to refresh weather data - Weather object is empty");
         }

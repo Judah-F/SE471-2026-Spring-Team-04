@@ -248,7 +248,7 @@
                                     </AnchorPane>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="136.0" prefWidth="167.0">
                                        <children>
-                                          <ImageView fx:id="sessionStaticMap" fitHeight="278.0" fitWidth="308.0" layoutX="-3.0" layoutY="-6.0" pickOnBounds="true" preserveRatio="true" />
+                                          <ImageView fx:id="sessionStaticMap" fitHeight="272.0" fitWidth="285.0" layoutX="15.0" pickOnBounds="true" preserveRatio="true" />
                                        </children>
                                     </AnchorPane>
                                 </items>

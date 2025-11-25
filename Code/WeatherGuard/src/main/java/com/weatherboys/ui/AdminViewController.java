@@ -203,7 +203,7 @@ public class AdminViewController implements Initializable {
             stage.show();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Navigation Error",
                 "Failed to load TeacherView: " + e.getMessage());
         }

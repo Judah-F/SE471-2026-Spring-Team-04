@@ -41,12 +41,20 @@ public class FiveDayForecastController implements Initializable {
     @FXML
     private Label location;
 
-    // Sets the forecast data and location details
-    public static void setForecast(Weather weatherObj, boolean useFahrenheitUnit) {
-        currentForecast = Forecast.fetchForecastForLocation(weatherObj.getLat(), weatherObj.getLon());
-        locationStr = weatherObj.getName();
-        forecastCountry = weatherObj.getCountry();
-        useFahrenheit = useFahrenheitUnit;
+    // Sets the forecast data directly (Facade pattern - preferred)
+    public static void setCurrentForecast(Forecast forecast) {
+        currentForecast = forecast;
+        locationStr = "Location";
+        forecastCountry = "";
+        useFahrenheit = true;
+    }
+
+    // Sets forecast with location info (Facade pattern - with location)
+    public static void setCurrentForecast(Forecast forecast, String location, String country) {
+        currentForecast = forecast;
+        locationStr = location;
+        forecastCountry = country;
+        useFahrenheit = true;
     }
 
     // Sets the label text with the formatted temperature
@@ -79,7 +87,7 @@ public class FiveDayForecastController implements Initializable {
 
         // Check if there is sufficient data for a 5-day forecast
         if (days.size() < 5) {
-            System.err.println("Insufficient data for 5-day forecast");
+            // System.err.println("Insufficient data for 5-day forecast");
             return;
         }
 
