@@ -1,5 +1,6 @@
 package com.weatherboys.ui;
 
+import com.weatherboys.model.ClassInfo;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,6 +13,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class TeacherViewController implements Initializable {
+
+    // Selected class data passed from AdminView
+    private ClassInfo selectedClass;
 
     // Buttons
     @FXML
@@ -51,6 +55,28 @@ public class TeacherViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("TeacherViewController initialized");
 
+        // Note: selectedClass will be set via setClassInfo() after initialize()
+        // We'll load data in setClassInfo() instead
+    }
+
+    /**
+     * Sets the class information for this view (called from AdminViewController)
+     *
+     * @param classInfo The class data to display
+     */
+    public void setClassInfo(ClassInfo classInfo) {
+        this.selectedClass = classInfo;
+
+        // Log the class data
+        System.out.println("TeacherView loaded for class: " + classInfo.getClassName());
+        System.out.println("  Class ID: " + classInfo.getClassId());
+        System.out.println("  Semester: " + classInfo.getFormattedSemester());
+        System.out.println("  City: " + classInfo.getCity());
+        System.out.println("  Professor: " + classInfo.getProfessorName());
+
+        // TODO: Initialize WeatherService with city
+        // TODO: Load students from database for this class
+        // TODO: Populate student labels
     }
 
     @FXML

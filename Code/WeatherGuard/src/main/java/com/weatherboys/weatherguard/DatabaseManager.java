@@ -3,6 +3,7 @@ package com.weatherboys.weatherguard;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import com.weatherboys.weatherguard.Weather.ConfigManager;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -12,16 +13,20 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * DatabaseManager handles all MongoDB operations for WeatherGuard attendance system.
  * Manages connections, sessions, and attendance records in MongoDB.
+ * Implements Singleton pattern for shared database access across controllers.
  */
 public class DatabaseManager {
 
     private static final Logger logger = Logger.getLogger(DatabaseManager.class.getName());
+    private static DatabaseManager instance = null;
+
     private final MongoClient mongoClient;
     private final MongoDatabase database;
     private final MongoCollection<Document> sessionsCollection;
@@ -46,6 +51,66 @@ public class DatabaseManager {
         this.studentsCollection = database.getCollection("students");
 
         logger.log(Level.INFO, "Connected to database: " + databaseName);
+    }
+
+    /**
+     * Gets the singleton instance of DatabaseManager.
+     * Loads configuration from config.properties and creates instance if needed.
+     *
+     * @return The DatabaseManager singleton instance
+     */
+    public static synchronized DatabaseManager getInstance() {
+        if (instance == null) {
+            try {
+                Properties config = ConfigManager.loadConfig();
+                String connectionString = config.getProperty("mongoConnectionString");
+                String databaseName = config.getProperty("mongoDatabaseName");
+
+                if (connectionString == null || databaseName == null) {
+                    logger.log(Level.SEVERE, "MongoDB configuration missing in config.properties");
+                    throw new RuntimeException("MongoDB configuration not found");
+                }
+
+                instance = new DatabaseManager(connectionString, databaseName);
+                logger.log(Level.INFO, "DatabaseManager singleton created");
+            } catch (IOException e) {
+                logger.log(Level.SEVERE, "Failed to load configuration", e);
+                throw new RuntimeException("Failed to initialize DatabaseManager", e);
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * Gets all classes from the database.
+     *
+     * @return List of all class documents
+     */
+    public List<Document> getAllClasses() {
+        List<Document> classes = new ArrayList<>();
+        try {
+            classesCollection.find().into(classes);
+            logger.log(Level.INFO, "Retrieved " + classes.size() + " classes from database");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to retrieve classes", e);
+        }
+        return classes;
+    }
+
+    /**
+     * Gets only active classes from the database (soft delete support).
+     *
+     * @return List of active class documents
+     */
+    public List<Document> getActiveClasses() {
+        List<Document> classes = new ArrayList<>();
+        try {
+            classesCollection.find(Filters.eq("active", true)).into(classes);
+            logger.log(Level.INFO, "Retrieved " + classes.size() + " active classes from database");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to retrieve active classes", e);
+        }
+        return classes;
     }
 
     /**
@@ -233,7 +298,7 @@ public class DatabaseManager {
             String professorName = br.readLine().split(",", 2)[1].trim();
             String city = br.readLine().split(",", 2)[1].trim();
 
-            // Create class document
+            // Create class document with active flag
             Document classDoc = new Document("classId", classId)
                     .append("className", className)
                     .append("semester", semester)
@@ -241,18 +306,30 @@ public class DatabaseManager {
                     .append("startDate", startDate)
                     .append("endDate", endDate)
                     .append("professorName", professorName)
-                    .append("city", city);
+                    .append("city", city)
+                    .append("active", true);
 
             // Check if class already exists
             Document existing = classesCollection.find(Filters.eq("classId", classId)).first();
             if (existing != null) {
-                logger.log(Level.WARNING, "Class already exists: " + classId + ". Deleting old class and students.");
-                classesCollection.deleteOne(Filters.eq("classId", classId));
-                studentsCollection.deleteMany(Filters.eq("classId", classId));
-            }
+                boolean wasActive = existing.getBoolean("active", true);
 
-            classesCollection.insertOne(classDoc);
-            logger.log(Level.INFO, "Class created: " + classId + " - " + className);
+                if (wasActive) {
+                    logger.log(Level.WARNING, "Active class already exists: " + classId + ". Updating and replacing students.");
+                } else {
+                    logger.log(Level.INFO, "Reactivating inactive class: " + classId);
+                }
+
+                // Update existing class document and set active = true
+                classesCollection.replaceOne(Filters.eq("classId", classId), classDoc);
+
+                // Delete old students to replace with new roster
+                studentsCollection.deleteMany(Filters.eq("classId", classId));
+            } else {
+                // Insert new class
+                classesCollection.insertOne(classDoc);
+                logger.log(Level.INFO, "Class created: " + classId + " - " + className);
+            }
 
             // Skip blank line and header
             br.readLine(); // blank line
@@ -353,6 +430,35 @@ public class DatabaseManager {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error retrieving class: " + classId, e);
             return null;
+        }
+    }
+
+    /**
+     * Soft deletes a class by setting its active flag to false.
+     * This preserves historical data while hiding the class from active views.
+     * Students enrolled in the class remain in the database for historical reporting.
+     *
+     * @param classId The class identifier to soft delete
+     * @return true if successful, false otherwise
+     */
+    public boolean deleteClass(String classId) {
+        try {
+            // Set active = false instead of actually deleting
+            long modifiedCount = classesCollection.updateOne(
+                Filters.eq("classId", classId),
+                Updates.set("active", false)
+            ).getModifiedCount();
+
+            if (modifiedCount > 0) {
+                logger.log(Level.INFO, "Successfully soft deleted (deactivated) class: " + classId);
+                return true;
+            } else {
+                logger.log(Level.WARNING, "Class not found for soft deletion: " + classId);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to soft delete class: " + classId, e);
+            return false;
         }
     }
 
