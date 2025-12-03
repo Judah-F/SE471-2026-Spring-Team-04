@@ -275,8 +275,10 @@ public class TeacherViewController implements Initializable {
         // Use reflection to safely extract weather data
         try {
             if (weather != null) {
-                // Display current weather
-                name2.setText(weather.getClass().getMethod("getName").invoke(weather).toString());
+                // Display current weather with city and country
+                String cityName = weather.getClass().getMethod("getName").invoke(weather).toString();
+                String country = weather.getClass().getMethod("getCountry").invoke(weather).toString();
+                name2.setText(cityName + ", " + country);
                 description2.setText(weather.getClass().getMethod("getDescription").invoke(weather).toString());
 
                 // Store both F and C temperatures from Weather object

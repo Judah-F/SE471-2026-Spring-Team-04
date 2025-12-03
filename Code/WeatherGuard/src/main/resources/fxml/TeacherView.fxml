@@ -11,7 +11,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.06856187290969899" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.weatherboys.ui.TeacherViewController">
+<SplitPane dividerPositions="0.06856187290969899" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.weatherboys.ui.TeacherViewController">
 <items>
     <AnchorPane maxHeight="40.0" minHeight="40.0" minWidth="0.0" prefHeight="40.0" prefWidth="600.0" style="-fx-background-color: darkgray;">
         <children>
@@ -33,7 +33,7 @@
                         <items>
                             <AnchorPane minHeight="0.0" minWidth="300.0" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: darkgray;">
                            <children>
-                              <Label fx:id="classNameLabel" alignment="CENTER" layoutX="61.0" prefHeight="25.0" prefWidth="179.0" text="Biology 101" textAlignment="CENTER">
+                              <Label fx:id="classNameLabel" alignment="CENTER" layoutX="2.0" prefHeight="30.0" prefWidth="300.0" text="Biology 101" textAlignment="CENTER">
                                  <font>
                                     <Font name="Tahoma" size="24.0" />
                                  </font>
@@ -44,7 +44,7 @@
                                  </font>
                               </Label>
                               <Button fx:id="startSessionButton" layoutX="106.0" layoutY="84.0" mnemonicParsing="false" onAction="#startSession" style="-fx-background-color: #6B8E6B;" text="Start Session" />
-                              <Label fx:id="professorLabel" alignment="CENTER" layoutX="96.0" layoutY="55.0" prefHeight="23.0" prefWidth="179.0" text="Dr. Anderson" textAlignment="CENTER">
+                              <Label fx:id="professorLabel" alignment="CENTER" layoutX="99.0" layoutY="55.0" prefHeight="23.0" prefWidth="179.0" text="Dr. Anderson" textAlignment="CENTER">
                                  <font>
                                     <Font name="Verdana" size="18.0" />
                                  </font>
@@ -302,7 +302,7 @@
                                     <Insets />
                                 </opaqueInsets>
                             </Button>
-                            <Label fx:id="name2" alignment="CENTER" layoutX="9.0" layoutY="51.0" prefHeight="60.0" prefWidth="278.0" text="Calsbad, CA">
+                            <Label fx:id="name2" alignment="CENTER" layoutX="2.0" layoutY="51.0" prefHeight="60.0" prefWidth="285.0" text="McMurdo Station, QA">
                                 <font>
                                     <Font name="Tahoma" size="30.0" />
                                 </font>
