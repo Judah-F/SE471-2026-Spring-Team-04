@@ -33,7 +33,7 @@
                         <items>
                             <AnchorPane minHeight="0.0" minWidth="300.0" prefHeight="600.0" prefWidth="300.0" style="-fx-background-color: darkgray;">
                            <children>
-                              <Label fx:id="classNameLabel" alignment="CENTER" layoutX="2.0" prefHeight="30.0" prefWidth="300.0" text="Biology 101" textAlignment="CENTER">
+                              <Label fx:id="classNameLabel" alignment="CENTER" prefHeight="30.0" prefWidth="300.0" text="Biology 101" textAlignment="CENTER">
                                  <font>
                                     <Font name="Tahoma" size="24.0" />
                                  </font>
