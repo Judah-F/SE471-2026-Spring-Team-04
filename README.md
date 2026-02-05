@@ -1,7 +1,7 @@
 # WeatherGuard Attendance
 
-**Team 02** | SE370 Fall 2025
-*Nat Grimm, Josh Clemens, Johnny Huynh, Roger Karam*
+**Team 04** | SE471 Spring 2026
+*Judah Fisher, Josh Clemens, Chima Ohaechesi, Roger Karam*
 
 ## Overview
 
@@ -32,81 +32,6 @@ WeatherGuard Attendance is a desktop application that modernizes classroom atten
 ### External APIs
 - **OpenWeatherMap API**: Real-time weather data and forecasts
 
-## Quick Start
-
-### Prerequisites
-- Java Runtime Environment (JRE) 11 or higher
-- MongoDB Atlas account (free tier)
-- OpenWeatherMap API key (free tier)
-
-### Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/SE370-2025-fall-team-02.git
-   cd SE370-2025-fall-team-02
-   ```
-
-2. **Configure database and API keys**
-   - Create `config.properties` from `config.properties.template`
-   - Add your MongoDB connection string
-   - Add your OpenWeatherMap API key
-
-3. **Build and run**
-   ```bash
-   # Using Gradle
-   cd Code/WeatherGuard
-   ./gradlew build
-   ./gradlew run
-   ```
-
-### First Time Use
-
-1. Launch the application (Admin View opens)
-2. Click "Upload Roster" and select a CSV file
-3. Double-click a class to open Teacher View
-4. Click "Start Session" to generate QR code
-5. Students scan and check in via mobile browser
-
-## Project Structure
-
-```
-SE370-2025-fall-team-02/
-├── Code/
-│   ├── WeatherGuard/          # JavaFX desktop application
-│   └── netlify-checkin/        # Student web portal
-├── Journal/                    # Sprint documentation
-├── Notes/                      # Development notes
-└── README.md
-```
-
-## Documentation
-
-- **Software Design Spec**: Detailed architecture, use cases, and design decisions (available in Downloads)
-- **Sprint Reports**: See `Journal/` folder for sprint planning and retrospectives
-- **User Manual**: See Software Design Spec Appendix 7.2
-
-## Key Design Decisions
-
-- **Layered Architecture**: Clear separation between Presentation, Business Logic, Data Access, and External Integration layers
-- **Singleton Pattern**: DatabaseManager ensures single connection instance
-- **Facade Pattern**: WeatherService simplifies complex weather subsystem
-- **Real-Time Polling**: 2-second updates during active sessions for live dashboard
-
-## Known Limitations
-
-- Maximum 34 students per class (UI grid layout)
-- Requires internet connectivity for all operations
-- Single active session per class at a time
-- No offline mode or data export functionality
-
-## Future Enhancements
-
-- Data export to Excel/CSV
-- Email notifications for absent students
-- Historical attendance analytics
-- Multi-location support for hybrid classes
-- Mobile app for teachers
 
 ## License
 
