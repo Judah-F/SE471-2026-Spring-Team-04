@@ -11,6 +11,9 @@ Focus of the meeting
 
 Goals for the next few days
   -Everyone gets set up with IDE
+    -make sure config.properties is set up
+    -make sure you have java 21 installed on your computer
+    -run it as a project from the build kts file
   -Chima will implement Observer
   -Roger will implement State
   -Judah will implement Strategy
