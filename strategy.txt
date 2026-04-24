@@ -1,0 +1,16 @@
+3) Strategy: WeatherGuard serves institutions in "extreme weather regions" meaning the
+rules for what constitutes acceptable attendance will vary by weather event and
+preference. Currently, attendance determination and the temperature unit toggle
+(setTemperatureUnit(boolean) in WeatherService) are both handled with inline
+conditionals. The Strategy pattern defines a family of interchangeable algorithms,
+encapsulates each one, and makes them swappable without changing the context object.
+Two concrete application areas exist immediately. First, an AttendanceRuleStrategyIF
+with implementations like StrictAttendanceStrategy (no grace period),
+GracePeriodStrategy (10-minute window), and WeatherLeniencyStrategy (extended
+window when outdoor temp < 32°F or wind > 40 mph) would let administrators
+configure per-class or per-weather policies without touching the controller. Second, the
+temperature unit preference already in WeatherService can be formalized as a
+TemperatureDisplayStrategyIF with FahrenheitStrategy and CelsiusStrategy
+implementations, replacing the boolean flag with a polymorphic call. Both usages share
+the same structural pattern: the context holds a reference to a StrategyIF, and swapping
+the reference changes the behavior at runtime without any if/else branching.
