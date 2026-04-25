@@ -8,4 +8,8 @@ public class WeatherLeniencyStrategy implements AttendanceRuleStrategyIF {
     public String determineStatus(){
         return "";
     }
+
+    public String name(){
+        return "";
+    }
 }
