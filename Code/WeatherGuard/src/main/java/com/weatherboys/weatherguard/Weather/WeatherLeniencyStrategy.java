@@ -1,4 +1,11 @@
 package com.weatherboys.weatherguard.Weather;
 
-public class WeatherLeniencyStrategy {
+public class WeatherLeniencyStrategy implements AttendanceRuleStrategyIF {
+    public String STATUS_PRESENT="";
+    public String STATUS_LATE="";
+    public String STATUS_ABSENT="";
+
+    public String determineStatus(){
+        return "";
+    }
 }
