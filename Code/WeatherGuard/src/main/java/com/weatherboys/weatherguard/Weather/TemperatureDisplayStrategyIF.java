@@ -1,4 +1,6 @@
 package com.weatherboys.weatherguard.Weather;
 
-public class TemperatureDisplayStrategyIF {
+public interface TemperatureDisplayStrategyIF {
+    public String format(int placeholder);
+    public String unitSymbol();
 }
