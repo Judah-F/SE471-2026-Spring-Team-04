@@ -1,4 +1,4 @@
-package com.weatherboys.weatherguard.Weather;
+package com.weatherboys.weatherguard.Weather.Strategy;
 
 public class TeacherViewController {
     private AttendanceRuleStrategyIF currentAttendanceRule;
