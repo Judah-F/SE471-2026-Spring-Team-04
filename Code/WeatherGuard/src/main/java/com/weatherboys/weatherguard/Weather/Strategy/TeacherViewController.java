@@ -7,7 +7,7 @@ public class TeacherViewController {
 
     }
 
-    public void recordCheckIn(int studentId){ //should this be int, string or perhaps a studentID class?
+    public void recordCheckIn(int studentId){
 
     }
 }

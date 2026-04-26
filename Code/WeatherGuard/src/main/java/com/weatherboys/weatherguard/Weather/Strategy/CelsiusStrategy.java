@@ -5,7 +5,7 @@ public class CelsiusStrategy implements TemperatureDisplayStrategyIF {
     @Override
     public String format(int tempf, int tempc) {
 
-        return "C";
+        return tempc+"°C";
     }
 
     @Override
