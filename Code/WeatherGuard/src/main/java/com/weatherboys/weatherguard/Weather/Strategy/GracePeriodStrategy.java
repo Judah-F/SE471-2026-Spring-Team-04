@@ -16,7 +16,7 @@ public class GracePeriodStrategy implements AttendanceRuleStrategyIF {
 
     public String determineStatus(LocalDateTime checkInTime, LocalDateTime sessionStart, Weather weather) {
 
-        LocalDateTime Grace = sessionStart.plusMinutes(presentMinutes); //Grace period 
+        LocalDateTime Grace = sessionStart.plusMinutes(presentMinutes); //Grace period
 
         if (checkInTime.isAfter(Grace)) {
             return STATUS_LATE;
