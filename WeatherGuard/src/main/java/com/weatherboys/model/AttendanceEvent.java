@@ -1,5 +1,5 @@
 package com.weatherboys.model;
-
+//comments
 import java.time.Instant;
 
 public final class AttendanceEvent {
@@ -33,7 +33,7 @@ public final class AttendanceEvent {
     public String getStudentId(){return studentId;}
     public String getStudentName(){return studentName;}
     public String getStatus(){return status;}
-    public Instant gettimestamp(){return timestamp;}
+    public Instant getTimestamp(){return timestamp;}
 
 
 
