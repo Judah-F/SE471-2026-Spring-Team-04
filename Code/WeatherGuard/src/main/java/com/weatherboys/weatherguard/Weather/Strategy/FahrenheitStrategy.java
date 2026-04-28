@@ -7,7 +7,7 @@ public class FahrenheitStrategy implements TemperatureDisplayStrategyIF {
     }
     @Override
     public String format(int tempf, int tempC) {
-
+//adding a comment
         return tempf+"°F";
     }
 }
