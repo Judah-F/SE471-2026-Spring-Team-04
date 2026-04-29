@@ -1,13 +1,14 @@
-package com.weatherboys.weatherguard.Weather.Strategy;
+package com.weatherboys.weatherguard.Strategy;
 
 public class FahrenheitStrategy implements TemperatureDisplayStrategyIF {
+
     @Override
     public String unitSymbol() {
-        return "°F";
+        return "F";
     }
+
     @Override
     public String format(int tempf, int tempC) {
-//adding a comment
-        return tempf+"°F";
+        return tempf + "°F";
     }
 }
