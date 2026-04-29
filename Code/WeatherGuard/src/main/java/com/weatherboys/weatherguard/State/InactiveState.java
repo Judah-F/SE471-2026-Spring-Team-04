@@ -1,4 +1,4 @@
-package com.weatherboys.state;
+package com.weatherboys.weatherguard.State;
 
 import com.weatherboys.ui.TeacherViewController;
 
