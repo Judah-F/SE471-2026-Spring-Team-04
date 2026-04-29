@@ -180,19 +180,7 @@ public class TeacherViewController implements Initializable {
      * @param classInfo The class data to display
      */
     public void setClassInfo(ClassInfo classInfo) {
-        this.selectedClass = classInfo;
-
-        // Update class info labels
-        updateClassInfoLabels();
-
-        // Initialize WeatherService facade with city from class
-        initializeWeather();
-
-        // Load students from database for this class
-        loadStudents();
-
-        // Load previous session data for pie chart
-        loadPreviousSessionData();
+        setClassInfo(classInfo, true);   // default to Fahrenheit
     }
 
     /**
@@ -204,25 +192,9 @@ public class TeacherViewController implements Initializable {
      */
     public void setClassInfo(ClassInfo classInfo, boolean useFahrenheit) {
         this.selectedClass = classInfo;
-
-        // Update class info labels
         updateClassInfoLabels();
-
-        // Initialize WeatherService facade with city from class
-        initializeWeather();
-
-        // Set temperature unit preference in the facade
-        if (weatherService != null) {
-            weatherService.setTemperatureUnit(useFahrenheit);
-        }
-
-        // Update temperature display with the correct unit
-        updateTemperatureDisplay();
-
-        // Load students from database for this class
+        initializeWeather(useFahrenheit);   // born with the correct Strategy
         loadStudents();
-
-        // Load previous session data for pie chart
         loadPreviousSessionData();
     }
 
@@ -250,23 +222,19 @@ public class TeacherViewController implements Initializable {
      * Uses Facade pattern - only interacts with WeatherService, not individual weather classes
      */
     private void initializeWeather() {
+        initializeWeather(true);   // default to Fahrenheit
+    }
+
+    private void initializeWeather(boolean useFahrenheit) {
         try {
-            // Get API key from config
             Properties config = ConfigManager.loadConfig();
             String apiKey = config.getProperty("apiKey");
-
-            // Create WeatherService facade with city from selected class
-            weatherService = new WeatherService(apiKey, selectedClass.getCity());
-
-            // Get all weather data through the facade
+            weatherService = new WeatherService(apiKey, selectedClass.getCity(), useFahrenheit);
             Map<String, Object> weatherData = weatherService.getAllWeatherInfo();
-
-            // Display weather information
             displayWeather(weatherData);
-
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Weather Error",
-                "Failed to load weather data: " + e.getMessage());
+                    "Failed to load weather data: " + e.getMessage());
         }
     }
 

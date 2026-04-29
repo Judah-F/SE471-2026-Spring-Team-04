@@ -44,19 +44,19 @@ public class WeatherService {
      * @param city The city name to fetch weather data for
      */
     public WeatherService(String apiKey, String city) {
+        this(apiKey, city, true);   // default to Fahrenheit
+    }
+
+    public WeatherService(String apiKey, String city, boolean useFahrenheit) {
         if (apiKey == null || apiKey.trim().isEmpty()) {
             throw new IllegalArgumentException("API key cannot be null or empty");
         }
         if (city == null || city.trim().isEmpty()) {
             throw new IllegalArgumentException("City cannot be null or empty");
         }
-
-        this.tempStrategy = new FahrenheitStrategy();   // default
         this.apiKey = apiKey;
         this.city = city;
-        this.useFahrenheit = true; // Default to Fahrenheit
-
-        // Initialize all weather data on construction
+        this.tempStrategy = useFahrenheit ? new FahrenheitStrategy() : new CelsiusStrategy();
         refreshAllData();
     }
 
