@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.weatherboys.weatherguard.Strategy.TemperatureDisplayStrategyIF;
+import com.weatherboys.weatherguard.Strategy.FahrenheitStrategy;
+import com.weatherboys.weatherguard.Strategy.CelsiusStrategy;
 
 /**
  * WeatherService - Facade Pattern Implementation
@@ -18,6 +21,9 @@ import java.util.logging.Logger;
  * - Makes controller code cleaner and easier to maintain
  */
 public class WeatherService {
+
+    // Strategy design
+    private TemperatureDisplayStrategyIF tempStrategy;
 
     private static final Logger logger = Logger.getLogger(WeatherService.class.getName());
 
@@ -45,6 +51,7 @@ public class WeatherService {
             throw new IllegalArgumentException("City cannot be null or empty");
         }
 
+        this.tempStrategy = new FahrenheitStrategy();   // default
         this.apiKey = apiKey;
         this.city = city;
         this.useFahrenheit = true; // Default to Fahrenheit
@@ -171,7 +178,7 @@ public class WeatherService {
     }
 
     public boolean isUsingFahrenheit() {
-        return useFahrenheit;
+        return tempStrategy instanceof FahrenheitStrategy;
     }
 
     /**
@@ -180,7 +187,8 @@ public class WeatherService {
      * @param useFahrenheit true for Fahrenheit, false for Celsius
      */
     public void setTemperatureUnit(boolean useFahrenheit) {
-        this.useFahrenheit = useFahrenheit;
+        this.tempStrategy = useFahrenheit ? new FahrenheitStrategy() : new CelsiusStrategy();
+        System.out.println("[WeatherService] strategy used: " + tempStrategy.getClass().getSimpleName());
     }
 
     /**
@@ -191,11 +199,9 @@ public class WeatherService {
      * @return Formatted temperature string with unit symbol
      */
     public String getFormattedTemperature(int tempFahrenheit, int tempCelsius) {
-        if (useFahrenheit) {
-            return tempFahrenheit + "°F";
-        } else {
-            return tempCelsius + "°C";
-        }
+        String result = tempStrategy.format(tempFahrenheit, tempCelsius);
+        System.out.println("[WeatherService] " + tempStrategy.getClass().getSimpleName() + ".format(" + tempFahrenheit + ", " + tempCelsius + ") = " + result);
+        return result;
     }
 
     /**

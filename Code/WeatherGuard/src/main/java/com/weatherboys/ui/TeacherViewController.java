@@ -275,8 +275,7 @@ public class TeacherViewController implements Initializable {
      */
     private void updateTemperatureDisplay() {
         if (weatherService != null && temp2 != null) {
-            String formattedTemp = weatherService.getFormattedTemperature(currentTempFahrenheit, currentTempCelsius);
-            temp2.setText(formattedTemp);
+            temp2.setText(weatherService.getFormattedTemperature(currentTempFahrenheit, currentTempCelsius));
         }
     }
 
