@@ -12,11 +12,11 @@ public abstract class SessionState {
 
     public abstract String name();
 
-    protected void onEnter(TeacherViewController ctx) {
+    public void onEnter(TeacherViewController ctx) {
         // default
     }
 
-    protected void onExit(TeacherViewController ctx) {
+    public void onExit(TeacherViewController ctx) {
         // default
     }
 }

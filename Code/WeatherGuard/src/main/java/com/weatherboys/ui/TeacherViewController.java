@@ -167,12 +167,111 @@ public class TeacherViewController implements Initializable {
     public SessionState getState() { return state; }
     public void setState(SessionState s) {
         System.out.println("[State] " + state.name() + " -> " + s.name());
+        state.onExit(this);
         this.state = s;
+        state.onEnter(this);
     }
 
-    public boolean openSessionPlumbing() { return true; }
-    public void closeSessionPlumbing()   { }
-    public void recordCheckIn(String studentId) { }
+    /** Validates roster has students. Returns false (and shows alert) if empty. */
+    public boolean validateRoster() {
+        if (classStudents.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "No Students",
+                    "No students are enrolled in this class.");
+            return false;
+        }
+        return true;
+    }
+
+    /** Opens the session: generates ID + QR, persists in DB, updates UI. */
+    public void openSessionUI() {
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+            currentSessionId = now.format(formatter);
+
+            Properties config = ConfigManager.loadConfig();
+            String baseUrl = config.getProperty("checkinBaseUrl", "https://wguard.netlify.app");
+
+            BufferedImage qrImage = QRCodeGenerator.generateSessionQRCode(
+                    selectedClass.getClassId(), baseUrl, 300, 300);
+
+            if (qrImage != null) {
+                Image fxImage = SwingFXUtils.toFXImage(qrImage, null);
+                sessionQRCode.setImage(fxImage);
+                sessionQRCode.setVisible(true);
+                sessionPieChart.setVisible(false);
+            }
+
+            String weatherData = "{}";
+            dbManager.createSession(selectedClass.getClassId(), currentSessionId, weatherData);
+            sessionActive = true;
+
+            for (Map.Entry<String, Label> entry : studentLabelMap.entrySet()) {
+                Label label = entry.getValue();
+                if (label.isVisible()) {
+                    label.setStyle("-fx-background-color: #9B6B6B;");
+                    studentStatusMap.put(entry.getKey(), "red");
+                }
+            }
+
+            startSessionButton.setVisible(false);
+            startSessionButton.setDisable(true);
+            endSessionButton.setVisible(true);
+            endSessionButton.setDisable(false);
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Session Error",
+                    "Failed to start session: " + e.getMessage());
+        }
+    }
+
+    /** Closes the session: closes DB, updates pie chart, resets UI. */
+    public void closeSessionUI() {
+        if (currentSessionId != null) {
+            dbManager.closeSession(currentSessionId);
+        }
+        sessionActive = false;
+
+        int totalStudents = studentLabelMap.size();
+        long checkedIn = studentStatusMap.values().stream()
+                .filter(status -> status.equals("green"))
+                .count();
+        long absent = totalStudents - checkedIn;
+
+        updatePieChart((int) checkedIn, (int) absent, "Current Session Results");
+
+        sessionQRCode.setVisible(false);
+        sessionPieChart.setVisible(true);
+
+        for (Map.Entry<String, Label> entry : studentLabelMap.entrySet()) {
+            Label label = entry.getValue();
+            if (label.isVisible()) {
+                label.setStyle("-fx-background-color: #808080;");
+                studentStatusMap.put(entry.getKey(), "gray");
+            }
+        }
+
+        sessionQRCode.setImage(null);
+        currentSessionId = null;
+
+        startSessionButton.setVisible(true);
+        startSessionButton.setDisable(false);
+        endSessionButton.setVisible(false);
+        endSessionButton.setDisable(true);
+    }
+
+    /** Marks a student as checked in. Called by ActiveState only. */
+    public void recordCheckIn(String studentId) {
+        Label label = studentLabelMap.get(studentId);
+        if (label != null) {
+            label.setStyle("-fx-background-color: #6B8E6B;");
+            studentStatusMap.put(studentId, "green");
+        }
+    }
+
+    /** Public wrappers around the existing private polling methods. */
+    public void startPolling() { startAttendancePolling(); }
+    public void stopPolling()  { stopAttendancePolling();  }
 
     /**
      * Sets the class information for this view (called from AdminViewController)
@@ -534,71 +633,7 @@ public class TeacherViewController implements Initializable {
      */
     @FXML
     public void startSession(ActionEvent event) {
-        if (classStudents.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "No Students",
-                "No students are enrolled in this class.");
-            return;
-        }
-
-        try {
-            // Generate unique session ID (timestamp-based)
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-            currentSessionId = now.format(formatter);
-
-            // Get check-in base URL from config
-            Properties config = ConfigManager.loadConfig();
-            String baseUrl = config.getProperty("checkinBaseUrl", "https://wguard.netlify.app");
-
-            // Generate QR code
-            BufferedImage qrImage = QRCodeGenerator.generateSessionQRCode(
-                selectedClass.getClassId(),
-                baseUrl,
-                300,
-                300
-            );
-
-            if (qrImage != null) {
-                // Display QR code in ImageView
-                Image fxImage = SwingFXUtils.toFXImage(qrImage, null);
-                sessionQRCode.setImage(fxImage);
-
-                // Toggle display: show QR code, hide pie chart
-                sessionQRCode.setVisible(true);
-                sessionPieChart.setVisible(false);
-            }
-
-            // Create session in database
-            String weatherData = "{}"; // TODO: Add current weather data
-            dbManager.createSession(selectedClass.getClassId(), currentSessionId, weatherData);
-
-            // Mark session as active
-            sessionActive = true;
-
-            // Turn all visible student labels red (not checked in yet)
-            for (Map.Entry<String, Label> entry : studentLabelMap.entrySet()) {
-                String studentId = entry.getKey();
-                Label label = entry.getValue();
-
-                if (label.isVisible()) {
-                    label.setStyle("-fx-background-color: #9B6B6B;"); // Red
-                    studentStatusMap.put(studentId, "red");
-                }
-            }
-
-            // Toggle buttons: hide Start, show End
-            startSessionButton.setVisible(false);
-            startSessionButton.setDisable(true);
-            endSessionButton.setVisible(true);
-            endSessionButton.setDisable(false);
-
-            // Start polling for attendance updates (every 2 seconds)
-            startAttendancePolling();
-
-        } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Session Error",
-                "Failed to start session: " + e.getMessage());
-        }
+        state.startSession(this);
     }
 
     /**
@@ -641,7 +676,7 @@ public class TeacherViewController implements Initializable {
 
             // Only update if label exists and hasn't been marked green yet
             if (status != null && !status.equals("green")) {
-                markStudentCheckedIn(studentId);
+                state.handleCheckIn(this, studentId);
             }
         }
     }
@@ -652,74 +687,21 @@ public class TeacherViewController implements Initializable {
      *
      * @param studentId The student ID who checked in
      */
-    private void markStudentCheckedIn(String studentId) {
-        Label label = studentLabelMap.get(studentId);
-
-        if (label != null && sessionActive) {
-            label.setStyle("-fx-background-color: #6B8E6B;"); // Green
-            studentStatusMap.put(studentId, "green");
-        }
-    }
+//    private void markStudentCheckedIn(String studentId) {
+//        Label label = studentLabelMap.get(studentId);
+//
+//        if (label != null && sessionActive) {
+//            label.setStyle("-fx-background-color: #6B8E6B;"); // Green
+//            studentStatusMap.put(studentId, "green");
+//        }
+//    }
 
     /**
      * Ends the attendance session
      */
     @FXML
     public void endSession(ActionEvent event) {
-        if (!sessionActive) {
-            showAlert(Alert.AlertType.WARNING, "No Active Session",
-                "No session is currently active.");
-            return;
-        }
-
-        // Stop polling for attendance updates
-        stopAttendancePolling();
-
-        // Close session in database
-        if (currentSessionId != null) {
-            dbManager.closeSession(currentSessionId);
-        }
-
-        // Mark session as inactive
-        sessionActive = false;
-
-        // Count attendance statistics
-        int totalStudents = studentLabelMap.size();
-        long checkedIn = studentStatusMap.values().stream()
-            .filter(status -> status.equals("green"))
-            .count();
-        long absent = totalStudents - checkedIn;
-
-        // Update pie chart with current session results
-        updatePieChart((int) checkedIn, (int) absent, "Current Session Results");
-
-        // Toggle display: hide QR code, show pie chart
-        sessionQRCode.setVisible(false);
-        sessionPieChart.setVisible(true);
-
-        // Reset all labels back to gray
-        for (Map.Entry<String, Label> entry : studentLabelMap.entrySet()) {
-            String studentId = entry.getKey();
-            Label label = entry.getValue();
-
-            if (label.isVisible()) {
-                label.setStyle("-fx-background-color: #808080;"); // Gray
-                studentStatusMap.put(studentId, "gray");
-            }
-        }
-
-        // Clear QR code image
-        sessionQRCode.setImage(null);
-
-        // Reset session ID
-        currentSessionId = null;
-
-        // Toggle buttons: show Start, hide End
-        startSessionButton.setVisible(true);
-        startSessionButton.setDisable(false);
-        endSessionButton.setVisible(false);
-        endSessionButton.setDisable(true);
-
+        state.endSession(this);
     }
 
     @FXML

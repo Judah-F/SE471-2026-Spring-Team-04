@@ -10,6 +10,7 @@ public class ClosedState extends SessionState {
 
     @Override
     public void startSession(TeacherViewController ctx) {
+        // Allow restart: bounce through Inactive to reach Active.
         ctx.setState(new InactiveState());
         ctx.getState().startSession(ctx);
     }
@@ -25,7 +26,10 @@ public class ClosedState extends SessionState {
     }
 
     @Override
-    public String name() {
-        return "Closed";
+    public void onEnter(TeacherViewController ctx) {
+        ctx.closeSessionUI();   // closes DB, updates pie chart, paints gray, switches buttons
     }
+
+    @Override
+    public String name() { return "Closed"; }
 }

@@ -2,20 +2,30 @@ package com.weatherboys.weatherguard.State;
 
 import com.weatherboys.ui.TeacherViewController;
 
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 public class ActiveState extends SessionState {
 
     private static final Logger logger = Logger.getLogger(ActiveState.class.getName());
 
+    private final LocalDateTime startedAt;
+
+    public ActiveState(LocalDateTime startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public LocalDateTime getStartedAt() {
+        return startedAt;
+    }
+
     @Override
     public void startSession(TeacherViewController ctx) {
-        logger.info("startSession called while already Active — ignoring.");
+        logger.info("startSession ignored — already Active.");
     }
 
     @Override
     public void endSession(TeacherViewController ctx) {
-        ctx.closeSessionPlumbing();
         ctx.setState(new ClosedState());
     }
 
@@ -25,7 +35,16 @@ public class ActiveState extends SessionState {
     }
 
     @Override
-    public String name() {
-        return "Active";
+    public void onEnter(TeacherViewController ctx) {
+        ctx.openSessionUI();      // generates QR, persists DB, paints red, switches buttons
+        ctx.startPolling();
     }
+
+    @Override
+    public void onExit(TeacherViewController ctx) {
+        ctx.stopPolling();
+    }
+
+    @Override
+    public String name() { return "Active"; }
 }

@@ -2,6 +2,7 @@ package com.weatherboys.weatherguard.State;
 
 import com.weatherboys.ui.TeacherViewController;
 
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 public class InactiveState extends SessionState {
@@ -10,14 +11,11 @@ public class InactiveState extends SessionState {
 
     @Override
     public void startSession(TeacherViewController ctx) {
-
-        boolean opened = ctx.openSessionPlumbing();
-        if (!opened) {
-            // Failed to open (e.g., no roster, config error). Stay Inactive.
+        if (!ctx.validateRoster()) {
+            // Roster empty or other precondition failed — stay Inactive.
             return;
         }
-
-        ctx.setState(new ActiveState());
+        ctx.setState(new ActiveState(LocalDateTime.now()));
     }
 
     @Override
@@ -27,11 +25,9 @@ public class InactiveState extends SessionState {
 
     @Override
     public void handleCheckIn(TeacherViewController ctx, String studentId) {
-        logger.warning("Check-in received for " + studentId + " but no active session; dropping.");
+        logger.warning("Check-in dropped: no active session for " + studentId);
     }
 
     @Override
-    public String name() {
-        return "Inactive";
-    }
+    public String name() { return "Inactive"; }
 }
