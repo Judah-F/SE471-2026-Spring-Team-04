@@ -4,6 +4,8 @@ import com.weatherboys.model.ClassInfo;
 import com.weatherboys.model.Student;
 import com.weatherboys.weatherguard.DatabaseManager;
 import com.weatherboys.weatherguard.QRCodeGenerator;
+import com.weatherboys.weatherguard.State.SessionState;
+import com.weatherboys.weatherguard.State.InactiveState;
 import com.weatherboys.weatherguard.Weather.ConfigManager;
 import com.weatherboys.weatherguard.Weather.WeatherService;
 import javafx.animation.KeyFrame;
@@ -36,6 +38,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TeacherViewController implements Initializable {
+
+    // State pattern
+    private SessionState state = new InactiveState();
 
     // Selected class data passed from AdminView
     private ClassInfo selectedClass;
@@ -155,6 +160,19 @@ public class TeacherViewController implements Initializable {
         // Note: selectedClass will be set via setClassInfo() after initialize()
         // We will load students and previous session data in setClassInfo()
     }
+
+    /**
+     * State pattern
+     */
+    public SessionState getState() { return state; }
+    public void setState(SessionState s) {
+        System.out.println("[State] " + state.name() + " -> " + s.name());
+        this.state = s;
+    }
+
+    public boolean openSessionPlumbing() { return true; }
+    public void closeSessionPlumbing()   { }
+    public void recordCheckIn(String studentId) { }
 
     /**
      * Sets the class information for this view (called from AdminViewController)
