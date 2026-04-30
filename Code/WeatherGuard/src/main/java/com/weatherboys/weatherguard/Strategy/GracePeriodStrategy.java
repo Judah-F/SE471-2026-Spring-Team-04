@@ -11,7 +11,7 @@ public class GracePeriodStrategy implements AttendanceRuleStrategyIF {
     private final int lateWindowMinutes;
 
     public GracePeriodStrategy() {
-        this(10, 10);
+        this(1, 10);
     }
 
     public GracePeriodStrategy(int presentMinutes, int lateWindowMinutes) {
