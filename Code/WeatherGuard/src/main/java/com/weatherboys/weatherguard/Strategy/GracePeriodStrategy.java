@@ -39,6 +39,11 @@ public class GracePeriodStrategy implements AttendanceRuleStrategyIF {
     }
 
     @Override
+    public int getEffectivePresentMinutes(com.weatherboys.weatherguard.Weather.Weather weather) {
+        return presentMinutes;
+    }
+
+    @Override
     public String name(){
         return "Grace(" + presentMinutes + "/" + lateWindowMinutes + ")";
     }

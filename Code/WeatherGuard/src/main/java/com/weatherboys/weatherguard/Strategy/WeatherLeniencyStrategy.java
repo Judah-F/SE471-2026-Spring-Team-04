@@ -9,9 +9,9 @@ public class WeatherLeniencyStrategy implements AttendanceRuleStrategyIF {
     private final AttendanceRuleStrategyIF inner;
     private final int extraGraceMinutes;
 
-    /** Default: 2 extra grace minutes when weather is extreme. */
+    /** Default: 1 extra grace minutes when weather is extreme. */
     public WeatherLeniencyStrategy(AttendanceRuleStrategyIF inner) {
-        this(inner, 2);
+        this(inner, 1);
     }
 
     public WeatherLeniencyStrategy(AttendanceRuleStrategyIF inner, int extraGraceMinutes) {
@@ -39,6 +39,17 @@ public class WeatherLeniencyStrategy implements AttendanceRuleStrategyIF {
     private boolean isExtreme(Weather weather) {
         if (weather == null || weather.isEmpty()) return false;
         return weather.getCurrentTemp() < 32;
+    }
+
+    @Override
+    public int getEffectivePresentMinutes(Weather weather) {
+        return inner.getEffectivePresentMinutes(weather) + getWeatherBonusMinutes(weather);
+    }
+
+    @Override
+    public int getWeatherBonusMinutes(Weather weather) {
+        int innerBonus = inner.getWeatherBonusMinutes(weather);
+        return isExtreme(weather) ? innerBonus + extraGraceMinutes : innerBonus;
     }
 
     @Override

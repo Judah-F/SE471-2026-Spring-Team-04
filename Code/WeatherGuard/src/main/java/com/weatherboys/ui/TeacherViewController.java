@@ -65,6 +65,7 @@ public class TeacherViewController implements Initializable, SessionObservableIF
     // Store current temperatures (both F and C from Weather object)
     private int currentTempFahrenheit;
     private int currentTempCelsius;
+    private Timeline labelRefreshTimer;
 
     // Database manager for student data
     private DatabaseManager dbManager;
@@ -101,7 +102,7 @@ public class TeacherViewController implements Initializable, SessionObservableIF
 
     // Class Info Labels
     @FXML
-    private Label classNameLabel, classIDLabel, professorLabel;
+    private Label classNameLabel, classIDLabel, professorLabel, weatherTimeAdded, lateCountdown;
 
     // Weather Labels
     @FXML
@@ -173,6 +174,10 @@ public class TeacherViewController implements Initializable, SessionObservableIF
 
         // Observer pattern — attach a console logger so we can see events flow live
         attach(new LoggingAttendanceObserver());
+
+        // Hidden until the State pattern transitions to Active
+        if (weatherTimeAdded != null) weatherTimeAdded.setVisible(false);
+        if (lateCountdown != null) lateCountdown.setVisible(false);
 
         // Note: selectedClass will be set via setClassInfo() after initialize()
         // We will load students and previous session data in setClassInfo()
@@ -354,6 +359,60 @@ public class TeacherViewController implements Initializable, SessionObservableIF
                 java.time.LocalDateTime.now()
         );
         notifyObservers(event);
+    }
+
+    /** Called by ActiveState.onEnter — start the per-second label updates. */
+    public void startLabelRefresh(LocalDateTime sessionStart) {
+        if (weatherTimeAdded == null || lateCountdown == null) return;
+
+        // Run once immediately so labels appear without waiting 1 second
+        updateRuleLabels(sessionStart);
+
+        weatherTimeAdded.setVisible(true);
+        lateCountdown.setVisible(true);
+
+        // Tick once per second
+        labelRefreshTimer = new Timeline(new KeyFrame(
+                Duration.seconds(1),
+                e -> updateRuleLabels(sessionStart)
+        ));
+        labelRefreshTimer.setCycleCount(Timeline.INDEFINITE);
+        labelRefreshTimer.play();
+    }
+
+    /** Called by ActiveState.onExit — stop updates and hide the labels. */
+    public void stopLabelRefresh() {
+        if (labelRefreshTimer != null) {
+            labelRefreshTimer.stop();
+            labelRefreshTimer = null;
+        }
+        if (weatherTimeAdded != null) weatherTimeAdded.setVisible(false);
+        if (lateCountdown != null) lateCountdown.setVisible(false);
+    }
+
+    /** Computes and renders the two labels based on the current rule + weather + clock. */
+    private void updateRuleLabels(LocalDateTime sessionStart) {
+        Weather weather = getCurrentWeather();
+        int totalMinutes = attendanceRule.getEffectivePresentMinutes(weather);
+        int bonus = attendanceRule.getWeatherBonusMinutes(weather);
+
+        // lateCountdown — countdown to the present cutoff
+        LocalDateTime lateAt = sessionStart.plusMinutes(totalMinutes);
+        long secondsRemaining = java.time.Duration.between(LocalDateTime.now(), lateAt).getSeconds();
+        if (secondsRemaining > 0) {
+            long mins = secondsRemaining / 60;
+            long secs = secondsRemaining % 60;
+            lateCountdown.setText(String.format("Late in: %d:%02d", mins, secs));
+        } else {
+            lateCountdown.setText("Late!");
+        }
+
+        // weatherTimeAdded — show how much grace the decorator is contributing right now
+        if (bonus > 0) {
+            weatherTimeAdded.setText("Time added: +" + bonus);
+        } else {
+            weatherTimeAdded.setText("Time added: 0 min");
+        }
     }
 
     /** Public wrappers around the existing private polling methods. */

@@ -44,11 +44,13 @@ public class ActiveState extends SessionState {
     public void onEnter(TeacherViewController ctx) {
         ctx.openSessionUI();
         ctx.startPolling();
+        ctx.startLabelRefresh(this.startedAt);
     }
 
     @Override
     public void onExit(TeacherViewController ctx) {
         ctx.stopPolling();
+        ctx.stopLabelRefresh();
     }
 
     @Override

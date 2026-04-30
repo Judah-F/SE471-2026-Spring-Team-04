@@ -10,4 +10,6 @@ public interface AttendanceRuleStrategyIF {
 
     public String determineStatus(LocalDateTime checkInTime, LocalDateTime sessionStart, Weather weather);
     public String name();
+    default int getEffectivePresentMinutes(Weather weather) { return 0; }
+    default int getWeatherBonusMinutes(Weather weather) { return 0; }
 }
