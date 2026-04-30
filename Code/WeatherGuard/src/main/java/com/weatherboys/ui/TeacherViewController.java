@@ -7,6 +7,10 @@ import com.weatherboys.weatherguard.QRCodeGenerator;
 import com.weatherboys.weatherguard.Strategy.AttendanceRuleStrategyIF;
 import com.weatherboys.weatherguard.Strategy.GracePeriodStrategy;
 import com.weatherboys.weatherguard.Strategy.WeatherLeniencyStrategy;
+import com.weatherboys.weatherguard.Observer.AttendanceEvent;
+import com.weatherboys.weatherguard.Observer.AttendanceObserverIF;
+import com.weatherboys.weatherguard.Observer.SessionObservableIF;
+import com.weatherboys.weatherguard.Observer.LoggingAttendanceObserver;
 import com.weatherboys.weatherguard.Weather.Weather;
 import com.weatherboys.weatherguard.State.SessionState;
 import com.weatherboys.weatherguard.State.InactiveState;
@@ -41,13 +45,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TeacherViewController implements Initializable {
+public class TeacherViewController implements Initializable, SessionObservableIF {
 
     // State pattern
     private SessionState state = new InactiveState();
 
     // Attendance rule Strategy — captured by each ActiveState at construction
     private AttendanceRuleStrategyIF attendanceRule = new WeatherLeniencyStrategy(new GracePeriodStrategy());
+
+    // Observer pattern — registered listeners for attendance events
+    private final java.util.List<AttendanceObserverIF> observers = new java.util.ArrayList<>();
 
     // Selected class data passed from AdminView
     private ClassInfo selectedClass;
@@ -164,6 +171,9 @@ public class TeacherViewController implements Initializable {
         // Load sunrise and sunset images
         loadSunriseAndSunsetImages();
 
+        // Observer pattern — attach a console logger so we can see events flow live
+        attach(new LoggingAttendanceObserver());
+
         // Note: selectedClass will be set via setClassInfo() after initialize()
         // We will load students and previous session data in setClassInfo()
     }
@@ -187,6 +197,31 @@ public class TeacherViewController implements Initializable {
     /** Returns current weather data through the Facade — used by ActiveState's check-in evaluation. */
     public Weather getCurrentWeather() {
         return weatherService != null ? weatherService.getCurrentWeatherData() : null;
+    }
+
+    // Observer pattern
+    @Override
+    public void attach(AttendanceObserverIF observer) {
+        if (observer != null && !observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    @Override
+    public void detach(AttendanceObserverIF observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(AttendanceEvent event) {
+        for (AttendanceObserverIF o : observers) {
+            try {
+                o.onAttendanceChanged(event);
+            } catch (Exception e) {
+                // Defensive: one bad observer must not break the chain
+                System.err.println("Observer error: " + e.getMessage());
+            }
+        }
     }
 
     /** Validates roster has students. Returns false (and shows alert) if empty. */
@@ -244,6 +279,9 @@ public class TeacherViewController implements Initializable {
 
     /** Closes the session: closes DB, updates pie chart, resets UI. */
     public void closeSessionUI() {
+        String closedSessionId = currentSessionId;
+        String classId = selectedClass != null ? selectedClass.getClassId() : "unknown";
+
         if (currentSessionId != null) {
             dbManager.closeSession(currentSessionId);
         }
@@ -275,6 +313,16 @@ public class TeacherViewController implements Initializable {
         startSessionButton.setDisable(false);
         endSessionButton.setVisible(false);
         endSessionButton.setDisable(true);
+        if (closedSessionId != null) {
+            AttendanceEvent event = new AttendanceEvent(
+                    AttendanceEvent.Kind.SESSION_CLOSED,
+                    closedSessionId,
+                    classId,
+                    null, null, null,
+                    java.time.LocalDateTime.now()
+            );
+            notifyObservers(event);
+        }
     }
 
     /** Marks a student as checked in. Called by ActiveState only. */
@@ -284,16 +332,28 @@ public class TeacherViewController implements Initializable {
 
         switch (status) {
             case AttendanceRuleStrategyIF.STATUS_PRESENT:
-                label.setStyle("-fx-background-color: #6B8E6B;");   // green
+                label.setStyle("-fx-background-color: #6B8E6B;");
                 break;
             case AttendanceRuleStrategyIF.STATUS_LATE:
-                label.setStyle("-fx-background-color: #BFA86F;");   // amber/yellow
+                label.setStyle("-fx-background-color: #BFA86F;");
                 break;
             case AttendanceRuleStrategyIF.STATUS_ABSENT:
-                // leave red — they checked in too late to count
+                // leave red
                 break;
         }
         studentStatusMap.put(studentId, status);
+
+        // Observer pattern — broadcast the check-in event
+        AttendanceEvent event = new AttendanceEvent(
+                AttendanceEvent.Kind.CHECK_IN,
+                currentSessionId != null ? currentSessionId : "unknown",
+                selectedClass != null ? selectedClass.getClassId() : "unknown",
+                studentId,
+                null,            // studentName not tracked here; observer can look up by id if needed
+                status,
+                java.time.LocalDateTime.now()
+        );
+        notifyObservers(event);
     }
 
     /** Public wrappers around the existing private polling methods. */
@@ -702,7 +762,7 @@ public class TeacherViewController implements Initializable {
             String status = studentStatusMap.get(studentId);
 
             // Only update if label exists and hasn't been marked green yet
-            if (status != null && !status.equals("green")) {
+            if ("red".equals(status)) {
                 state.handleCheckIn(this, studentId);
             }
         }
