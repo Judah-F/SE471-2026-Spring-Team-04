@@ -293,12 +293,15 @@ public class TeacherViewController implements Initializable, SessionObservableIF
         sessionActive = false;
 
         int totalStudents = studentLabelMap.size();
-        long checkedIn = studentStatusMap.values().stream()
-                .filter(status -> status.equals("green"))
+        long present = studentStatusMap.values().stream()
+                .filter(AttendanceRuleStrategyIF.STATUS_PRESENT::equals)
                 .count();
-        long absent = totalStudents - checkedIn;
+        long late = studentStatusMap.values().stream()
+                .filter(AttendanceRuleStrategyIF.STATUS_LATE::equals)
+                .count();
+        long absent = totalStudents - present - late;
 
-        updatePieChart((int) checkedIn, (int) absent, "Current Session Results");
+        updatePieChart((int) present, (int) late, (int) absent, "Current Session Results");
 
         sessionQRCode.setVisible(false);
         sessionPieChart.setVisible(true);
@@ -704,54 +707,41 @@ public class TeacherViewController implements Initializable, SessionObservableIF
         }
     }
 
-    /**
-     * Updates the pie chart with attendance data
-     *
-     * @param present Number of students present
-     * @param absent Number of students absent
-     * @param title Title for the pie chart
-     */
+    /** Backward-compatible 3-arg version — used by loadPreviousSessionData where late info isn't available. */
     private void updatePieChart(int present, int absent, String title) {
-        if (sessionPieChart == null) {
-            return;
-        }
+        updatePieChart(present, 0, absent, title);
+    }
+
+    /** 4-arg version — current sessions break out Late as its own slice. */
+    private void updatePieChart(int present, int late, int absent, String title) {
+        if (sessionPieChart == null) return;
 
         sessionPieChart.setTitle(title);
 
-        if (present == 0 && absent == 0) {
-            // Empty data - clear chart
+        if (present == 0 && late == 0 && absent == 0) {
             sessionPieChart.setData(FXCollections.observableArrayList());
             return;
         }
 
-        // Create pie chart data
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
-            new PieChart.Data("Present (" + present + ")", present),
-            new PieChart.Data("Absent (" + absent + ")", absent)
-        );
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        if (present > 0) pieChartData.add(new PieChart.Data("Present (" + present + ")", present));
+        if (late    > 0) pieChartData.add(new PieChart.Data("Late (" + late + ")", late));
+        if (absent  > 0) pieChartData.add(new PieChart.Data("Absent (" + absent + ")", absent));
 
         sessionPieChart.setData(pieChartData);
 
-        // Apply custom colors to match label colors
-        // Must be done after chart is rendered, so use Platform.runLater
+        // Apply custom colors to match label colors. Must run after the chart is rendered.
         javafx.application.Platform.runLater(() -> {
             int nodeIndex = 0;
             for (PieChart.Data data : pieChartData) {
-                // Style the pie slice
                 javafx.scene.Node node = sessionPieChart.lookup(".data" + nodeIndex);
                 if (node != null) {
-                    String color;
-                    if (data.getName().startsWith("Present")) {
-                        color = "#6B8E6B"; // Green (matches checked-in label)
-                    } else {
-                        color = "#9B6B6B"; // Red (matches not-checked-in label)
-                    }
-                    node.setStyle("-fx-pie-color: " + color + ";");
+                    node.setStyle("-fx-pie-color: " + colorForSlice(data.getName()) + ";");
                 }
                 nodeIndex++;
             }
 
-            // Style the legend symbols (circles)
+            // Style the legend symbols
             javafx.scene.Node legend = sessionPieChart.lookup(".chart-legend");
             if (legend != null) {
                 int symbolIndex = 0;
@@ -759,19 +749,20 @@ public class TeacherViewController implements Initializable, SessionObservableIF
                     if (legendItem instanceof javafx.scene.control.Label) {
                         javafx.scene.Node symbol = legendItem.lookup(".chart-legend-item-symbol");
                         if (symbol != null && symbolIndex < pieChartData.size()) {
-                            String color;
-                            if (pieChartData.get(symbolIndex).getName().startsWith("Present")) {
-                                color = "#6B8E6B"; // Green
-                            } else {
-                                color = "#9B6B6B"; // Red
-                            }
-                            symbol.setStyle("-fx-background-color: " + color + ";");
+                            symbol.setStyle("-fx-background-color: " + colorForSlice(pieChartData.get(symbolIndex).getName()) + ";");
                         }
                         symbolIndex++;
                     }
                 }
             }
         });
+    }
+
+    /** Centralized color map — keeps slice and legend colors in sync. */
+    private String colorForSlice(String sliceName) {
+        if (sliceName.startsWith("Present")) return "#6B8E6B";
+        if (sliceName.startsWith("Late"))    return "#BFA86F";
+        return "#9B6B6B";
     }
 
     /**
