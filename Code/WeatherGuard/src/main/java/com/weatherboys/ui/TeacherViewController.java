@@ -4,6 +4,10 @@ import com.weatherboys.model.ClassInfo;
 import com.weatherboys.model.Student;
 import com.weatherboys.weatherguard.DatabaseManager;
 import com.weatherboys.weatherguard.QRCodeGenerator;
+import com.weatherboys.weatherguard.Strategy.AttendanceRuleStrategyIF;
+import com.weatherboys.weatherguard.Strategy.GracePeriodStrategy;
+import com.weatherboys.weatherguard.Strategy.WeatherLeniencyStrategy;
+import com.weatherboys.weatherguard.Weather.Weather;
 import com.weatherboys.weatherguard.State.SessionState;
 import com.weatherboys.weatherguard.State.InactiveState;
 import com.weatherboys.weatherguard.Weather.ConfigManager;
@@ -41,6 +45,9 @@ public class TeacherViewController implements Initializable {
 
     // State pattern
     private SessionState state = new InactiveState();
+
+    // Attendance rule Strategy — captured by each ActiveState at construction
+    private AttendanceRuleStrategyIF attendanceRule = new WeatherLeniencyStrategy(new GracePeriodStrategy());
 
     // Selected class data passed from AdminView
     private ClassInfo selectedClass;
@@ -172,6 +179,16 @@ public class TeacherViewController implements Initializable {
         state.onEnter(this);
     }
 
+    /** Returns the current attendance rule Strategy. ActiveState reads this at construction. */
+    public AttendanceRuleStrategyIF getAttendanceRule() {
+        return attendanceRule;
+    }
+
+    /** Returns current weather data through the Facade — used by ActiveState's check-in evaluation. */
+    public Weather getCurrentWeather() {
+        return weatherService != null ? weatherService.getCurrentWeatherData() : null;
+    }
+
     /** Validates roster has students. Returns false (and shows alert) if empty. */
     public boolean validateRoster() {
         if (classStudents.isEmpty()) {
@@ -261,12 +278,22 @@ public class TeacherViewController implements Initializable {
     }
 
     /** Marks a student as checked in. Called by ActiveState only. */
-    public void recordCheckIn(String studentId) {
+    public void recordCheckIn(String studentId, String status) {
         Label label = studentLabelMap.get(studentId);
-        if (label != null) {
-            label.setStyle("-fx-background-color: #6B8E6B;");
-            studentStatusMap.put(studentId, "green");
+        if (label == null) return;
+
+        switch (status) {
+            case AttendanceRuleStrategyIF.STATUS_PRESENT:
+                label.setStyle("-fx-background-color: #6B8E6B;");   // green
+                break;
+            case AttendanceRuleStrategyIF.STATUS_LATE:
+                label.setStyle("-fx-background-color: #BFA86F;");   // amber/yellow
+                break;
+            case AttendanceRuleStrategyIF.STATUS_ABSENT:
+                // leave red — they checked in too late to count
+                break;
         }
+        studentStatusMap.put(studentId, status);
     }
 
     /** Public wrappers around the existing private polling methods. */
@@ -707,6 +734,8 @@ public class TeacherViewController implements Initializable {
     @FXML
     public void switchToFiveDayForecastView(ActionEvent event) {
         try {
+            // Cleanly close any active session via the State pattern before destroying this controller.
+            state.endSession(this);
             // Pass forecast data to FiveDayForecastController using Facade pattern
             if (weatherService != null) {
                 var forecast = weatherService.getFiveDayForecast();
@@ -753,10 +782,7 @@ public class TeacherViewController implements Initializable {
     @FXML
     public void switchToAdminView(ActionEvent event) {
         try {
-            // Stop polling timer if session is active
-            if (sessionActive) {
-                stopAttendancePolling();
-            }
+            state.endSession(this);
 
             // Load AdminView FXML
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/AdminView.fxml"));

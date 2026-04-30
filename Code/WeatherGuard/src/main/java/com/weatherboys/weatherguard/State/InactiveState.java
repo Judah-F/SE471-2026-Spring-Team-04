@@ -12,10 +12,9 @@ public class InactiveState extends SessionState {
     @Override
     public void startSession(TeacherViewController ctx) {
         if (!ctx.validateRoster()) {
-            // Roster empty or other precondition failed — stay Inactive.
             return;
         }
-        ctx.setState(new ActiveState(LocalDateTime.now()));
+        ctx.setState(new ActiveState(LocalDateTime.now(), ctx.getAttendanceRule()));
     }
 
     @Override
